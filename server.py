@@ -135,6 +135,28 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             raise APIError(403, "Forbidden", "Admin privilege required for this resource.", "FORBIDDEN_NOT_ADMIN")
         return user
 
+    def do_HEAD(self):
+        try:
+            parsed = urlparse(self.path)
+            path = parsed.path
+            if path == "/" or not path:
+                path = "/index.html"
+            clean_path = os.path.normpath(path.lstrip("/"))
+            file_path = os.path.join(STATIC_DIR, clean_path)
+            if not os.path.isfile(file_path):
+                file_path = os.path.join(STATIC_DIR, "index.html")
+            if os.path.isfile(file_path):
+                mime_type, _ = mimetypes.guess_type(file_path)
+                self.send_response(HTTPStatus.OK)
+                self.send_header("Content-Type", mime_type or "text/html")
+                self.send_header("Content-Length", str(os.path.getsize(file_path)))
+                self._send_cors_headers()
+                self.end_headers()
+            else:
+                self.send_error_json(404, "Not Found", "File not found.", "STATIC_NOT_FOUND")
+        except Exception:
+            self.send_error_json(500, "Internal Server Error", "Server error", "SERVER_ERROR")
+
     # ==========================
     # Router Entry Points
     # ==========================
