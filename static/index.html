@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULSE GYM - Online Session Booking & Check-in System</title>
+  <meta name="description" content="Seamless 1-hour gym session booking system with instant seat confirmation, automated FIFO waitlist promotion, and cryptographically secure door check-in.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <!-- Quick Demo Persona Switcher Bar -->
+  <header class="demo-bar" aria-label="Demo Testing Controls">
+    <div class="demo-bar-title">
+      <span>⚡ Quick Demo Switcher:</span>
+    </div>
+    <div class="demo-personas" id="demo-personas-container">
+      <button type="button" class="demo-chip admin" data-email="admin@gympulse.com" data-pass="AdminPass123!">
+        🛡️ Admin (Staff)
+      </button>
+      <button type="button" class="demo-chip" data-email="sarah@gympulse.com" data-pass="MemberPass123!">
+        👤 Sarah (Has Bookings)
+      </button>
+      <button type="button" class="demo-chip" data-email="mike@gympulse.com" data-pass="MemberPass123!">
+        ⏳ Mike (Waitlisted)
+      </button>
+      <button type="button" class="demo-chip" data-email="alex@gympulse.com" data-pass="MemberPass123!">
+        ✨ Alex (New Member)
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Navigation -->
+  <nav class="navbar" aria-label="Main Navigation">
+    <a href="#sessions" class="nav-brand" id="brand-link">
+      <span>PULSE</span>
+      <span class="brand-badge">GYM</span>
+    </a>
+
+    <ul class="nav-links" id="main-nav-links">
+      <li id="nav-item-sessions" class="hidden">
+        <a href="#sessions" class="nav-link" id="nav-sessions">Browse Sessions</a>
+      </li>
+      <li id="nav-item-my-bookings" class="hidden">
+        <a href="#my-bookings" class="nav-link" id="nav-my-bookings">My Bookings</a>
+      </li>
+      <li id="nav-item-admin" class="hidden">
+        <a href="#admin" class="nav-link" id="nav-admin">Admin Dashboard</a>
+      </li>
+    </ul>
+
+    <div class="nav-user" id="nav-user-panel">
+      <!-- Injected via JavaScript based on auth state -->
+    </div>
+  </nav>
+
+  <!-- Global Notification / Toast Container -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- QR Code Modal (Extra Feature) -->
+  <div class="modal-overlay" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="qr-modal-close" aria-label="Close modal">&times;</button>
+      <h3 id="qr-modal-title" style="margin-bottom: 8px;">Check-In QR Ticket</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">
+        Show this QR code or code at gym reception during your session hour:
+      </p>
+      <div id="qr-svg-wrapper" style="margin: 0 auto; display: inline-block;"></div>
+      <div style="margin-top: 16px;">
+        <span class="ticket-code-label">Access Code</span>
+        <div class="ticket-code" id="qr-modal-code" style="font-size: 2rem;">------</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Main Content Container -->
+  <main class="container" id="main-content">
+
+    <!-- ==========================================
+         PAGE 1: LOGIN & REGISTER
+         ========================================== -->
+    <section id="view-auth" class="page-view" style="display: none;">
+      <div class="auth-wrapper">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;">Welcome to PULSE GYM</h1>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
+            Book 1-hour sessions, track waitlists & access door check-in.
+          </p>
+        </div>
+
+        <div class="auth-tabs" role="tablist">
+          <button type="button" class="auth-tab active" id="tab-btn-login" role="tab" aria-selected="true" aria-controls="auth-form-login">Log In</button>
+          <button type="button" class="auth-tab" id="tab-btn-register" role="tab" aria-selected="false" aria-controls="auth-form-register">Register Member</button>
+        </div>
+
+        <!-- Inline Error Banner -->
+        <div id="auth-error-banner" class="error-banner" style="display: none;" role="alert">
+          <span id="auth-error-text"></span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="auth-form-login" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email Address</label>
+            <input type="email" id="login-email" class="form-input" placeholder="you@gympulse.com" required autocomplete="email">
+            <div class="form-error" id="login-email-error">Please enter a valid email address.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+            <div class="form-error" id="login-password-error">Password is required.</div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; margin-top: 8px;">
+            <span>Log In</span>
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="auth-form-register" style="display: none;" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" class="form-input" placeholder="e.g. Sarah Connor" required autocomplete="name">
+            <div class="form-error" id="reg-name-error">Name must be at least 2 characters.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email Address</label>
+            <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" required autocomplete="email">
+            <div class="form-error" id="reg-email-error">Please enter a valid email address.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password (min 6 characters)</label>
+            <input type="password" id="reg-password" class="form-input" placeholder="••••••••" required autocomplete="new-password">
+            <div class="form-error" id="reg-password-error">Password must be at least 6 characters.</div>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px;">
+            Note: Registration creates a member account. Admin accounts are managed directly by gym management.
+          </p>
+          <button type="submit" class="btn btn-primary" id="btn-reg-submit" style="width: 100%;">
+            <span>Create Member Account</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 2: SESSIONS LIST
+         ========================================== -->
+    <section id="view-sessions" class="page-view" style="display: none;">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gym Sessions</h1>
+          <p class="page-subtitle">1-hour training blocks with strict 20-person capacity. Real-time availability.</p>
+        </div>
+        <div class="live-pulse" title="Live background sync active every 4 seconds">
+          <span class="pulse-dot"></span>
+          <span>Live Availability Sync</span>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label for="filter-date" class="filter-label">Date:</label>
+          <input type="date" id="filter-date" class="form-input" style="width: auto; min-width: 160px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-today">Today</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-tomorrow">Tomorrow</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-date">Show All Dates</button>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-status" class="filter-label">Filter:</label>
+          <select id="filter-status" class="form-select" style="width: auto; min-width: 150px;">
+            <option value="all">All Sessions</option>
+            <option value="available">Available Spots</option>
+            <option value="full">Full (Waitlist Open)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="sessions-loading" class="loading-box">
+        <div class="spinner"></div>
+        <p>Loading available gym sessions...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="sessions-error" class="error-banner" style="display: none;">
+        <span id="sessions-error-msg"></span>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-retry-sessions">Retry</button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="sessions-empty" class="empty-state" style="display: none;">
+        <h3>No sessions found</h3>
+        <p>There are no sessions scheduled for this date. Check another date or ask staff to create one.</p>
+      </div>
+
+      <!-- Sessions Grid -->
+      <div class="sessions-grid" id="sessions-container"></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 3: MY BOOKINGS
+         ========================================== -->
+    <section id="view-my-bookings" class="page-view" style="display: none;">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Bookings & Waitlists</h1>
+          <p class="page-subtitle">View your access codes, door check-in countdowns, and automated waitlist queues.</p>
+        </div>
+        <a href="#sessions" class="btn btn-primary btn-sm">+ Book Another Session</a>
+      </div>
+
+      <!-- Loading State -->
+      <div id="my-bookings-loading" class="loading-box">
+        <div class="spinner"></div>
+        <p>Loading your bookings...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="my-bookings-error" class="error-banner" style="display: none;">
+        <span id="my-bookings-error-msg"></span>
+      </div>
+
+      <!-- Bookings Content -->
+      <div id="my-bookings-content" style="display: none;">
+        <!-- Confirmed / Past Bookings Section -->
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 14px;">Confirmed Session Passes</h2>
+        <div id="my-confirmed-list"></div>
+
+        <!-- Waitlist Section -->
+        <div style="margin-top: 36px;">
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Waitlist Standby</h2>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">
+            If someone cancels before the session begins, you are automatically booked and assigned an unguessable check-in code.
+          </p>
+          <div id="my-waitlist-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 4: ADMIN PAGE
+         ========================================== -->
+    <section id="view-admin" class="page-view" style="display: none;">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gym Staff Operations</h1>
+          <p class="page-subtitle">Create sessions, monitor attendance rosters, and check members in at the door.</p>
+        </div>
+        <span class="badge badge-confirmed" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border-color: rgba(168, 85, 247, 0.4);">
+          🛡️ Admin Access Active
+        </span>
+      </div>
+
+      <!-- Admin Overview Stats (Extra Feature) -->
+      <div class="admin-stats-grid" id="admin-stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">Total Sessions</span>
+          <span class="stat-value" id="stat-sessions">-</span>
+          <span class="stat-sub">Across all dates</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Confirmed Bookings</span>
+          <span class="stat-value" id="stat-confirmed">-</span>
+          <span class="stat-sub">Active reservations</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Checked In</span>
+          <span class="stat-value" id="stat-checked-in">-</span>
+          <span class="stat-sub" id="stat-attendance-rate">0% attendance rate</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Waitlist Queue</span>
+          <span class="stat-value" id="stat-waitlist">-</span>
+          <span class="stat-sub">Waiting for promotion</span>
+        </div>
+      </div>
+
+      <!-- Action 1: Door Check-In Redemption Box -->
+      <div class="checkin-box">
+        <h2 style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <span>🚪 Reception Desk Check-in</span>
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
+          Type the member's 6-character short code. Works once only, strictly during the session's 1-hour window.
+        </p>
+
+        <form id="admin-checkin-form" novalidate>
+          <div class="checkin-input-group">
+            <input type="text" id="admin-checkin-code" class="form-input checkin-code-input" placeholder="e.g. 7XKP2Q" maxlength="10" required autocomplete="off">
+            <button type="submit" class="btn btn-primary" id="btn-checkin-submit">
+              <span>Mark Present</span>
+            </button>
+          </div>
+          <div class="form-error" id="admin-checkin-error">Please enter a valid code.</div>
+        </form>
+
+        <!-- Check-in Success Confirmation Card -->
+        <div id="checkin-success-box" style="display: none; margin-top: 18px; padding: 16px; background: rgba(0, 240, 118, 0.1); border: 1px solid var(--accent-lime); border-radius: var(--radius-md);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">✅</span>
+            <div>
+              <h4 id="checkin-member-name" style="font-size: 1.1rem; color: var(--accent-lime);">Member Name</h4>
+              <p id="checkin-member-details" style="font-size: 0.85rem; color: var(--text-secondary);">Email & Session</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action 2: Create Session Form -->
+      <div class="checkin-box" style="margin-bottom: 28px;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Create New Gym Session</h2>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">
+          Sessions start on the hour and last 1 hour with a capacity of 20. Two sessions cannot share a start time.
+        </p>
+
+        <form id="admin-create-session-form" novalidate style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="new-session-date">Session Date</label>
+            <input type="date" id="new-session-date" class="form-input" required>
+            <div class="form-error" id="new-session-date-error">Valid date is required.</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="new-session-hour">Start Hour</label>
+            <select id="new-session-hour" class="form-select" required>
+              <option value="6">06:00 AM (Early Bird)</option>
+              <option value="7">07:00 AM</option>
+              <option value="8">08:00 AM</option>
+              <option value="9">09:00 AM</option>
+              <option value="10">10:00 AM</option>
+              <option value="11">11:00 AM</option>
+              <option value="12">12:00 PM (Noon)</option>
+              <option value="13">01:00 PM</option>
+              <option value="14">02:00 PM</option>
+              <option value="15">03:00 PM</option>
+              <option value="16">04:00 PM</option>
+              <option value="17">05:00 PM (Evening Rush)</option>
+              <option value="18">06:00 PM</option>
+              <option value="19">07:00 PM</option>
+              <option value="20">08:00 PM</option>
+              <option value="21">09:00 PM</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="new-session-capacity">Capacity</label>
+            <input type="number" id="new-session-capacity" class="form-input" value="20" min="1" max="100" readonly title="Default capacity is 20 per challenge specifications">
+          </div>
+
+          <div>
+            <button type="submit" class="btn btn-primary" id="btn-create-session-submit" style="width: 100%;">
+              <span>+ Create Session</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Action 3: Session Roster Inspector -->
+      <div class="checkin-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Session Attendee Roster</h2>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Select any session to view its confirmed attendees and live waitlist.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <label for="admin-roster-session-select" class="filter-label">Session:</label>
+            <select id="admin-roster-session-select" class="form-select" style="min-width: 240px;"></select>
+          </div>
+        </div>
+
+        <div id="admin-roster-loading" class="loading-box" style="display: none;">
+          <div class="spinner"></div>
+          <p>Loading session roster...</p>
+        </div>
+
+        <div id="admin-roster-content">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-subtle); margin-top: auto;">
+    <p>PULSE GYM &copy; 2026. Built with Python 3.13, SQLite (ACID Immediate Transactions), and Modern Vanilla ES6.</p>
+  </footer>
+
+  <script src="/js/app.js" type="module"></script>
+</body>
+</html>
