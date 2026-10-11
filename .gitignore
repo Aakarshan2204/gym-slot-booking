@@ -1,0 +1,12 @@
+# Environments
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+*.db
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
