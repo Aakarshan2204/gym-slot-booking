@@ -91,8 +91,9 @@ def seed_database():
             (session_now_id, sarah_id, code_now)
         )
 
-        # Session 2: FULL SESSION today at 19:00 (or 21:00 if current hour is past)
-        full_hour = 21 if current_hour >= 19 else 19
+        # Session 2: FULL SESSION today (distinct hour from current_hour)
+        # Pick an hour that doesn't collide with current_hour
+        full_hour = 22 if current_hour != 22 else 23
         session_full_id = make_session(today, full_hour)
         # Fill with 20 confirmed bookings
         for uid in synthetic_member_ids[:20]:
