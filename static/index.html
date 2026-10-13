@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE GYM - Online Session Booking & Check-in System</title>
   <meta name="description" content="Seamless 1-hour gym session booking system with instant seat confirmation, automated FIFO waitlist promotion, and cryptographically secure door check-in.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 </head>
@@ -29,6 +32,17 @@
         ✨ Alex (New Member)
       </button>
     </div>
+
+    <!-- Live Audio Feedback Toggle with Animated Equalizer Bars -->
+    <button type="button" class="sound-toggle-btn" id="btn-sound-toggle" title="Toggle audio feedback">
+      <span class="sound-wave">
+        <span class="sw-bar"></span>
+        <span class="sw-bar"></span>
+        <span class="sw-bar"></span>
+        <span class="sw-bar"></span>
+      </span>
+      <span id="sound-toggle-label">Sound: ON</span>
+    </button>
   </header>
 
   <!-- Main Navigation -->
@@ -58,18 +72,41 @@
   <!-- Global Notification / Toast Container -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- QR Code Modal (Extra Feature) -->
+  <!-- VIP QR Code Modal (Real ISO/IEC 18004 Standard QR Code) -->
   <div class="modal-overlay" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
-    <div class="modal-content">
+    <div class="modal-content vip-ticket-modal">
       <button type="button" class="modal-close" id="qr-modal-close" aria-label="Close modal">&times;</button>
-      <h3 id="qr-modal-title" style="margin-bottom: 8px;">Check-In QR Ticket</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">
-        Show this QR code or code at gym reception during your session hour:
+      <div class="vip-ticket-badge">⚡ VIP ATHLETIC DOOR PASS</div>
+      <h3 id="qr-modal-title" class="vip-modal-title">Door Check-In Ticket</h3>
+      <p id="qr-modal-subtitle" class="vip-modal-subtitle">
+        Scan with your smartphone camera or turnstile reader during your 1-hour session window:
       </p>
-      <div id="qr-svg-wrapper" style="margin: 0 auto; display: inline-block;"></div>
-      <div style="margin-top: 16px;">
-        <span class="ticket-code-label">Access Code</span>
-        <div class="ticket-code" id="qr-modal-code" style="font-size: 2rem;">------</div>
+      
+      <!-- Optical Viewfinder with Targeting Crosshairs & Animated Laser Scan Line -->
+      <div class="qr-scanner-viewfinder">
+        <div class="vf-corner tl"></div>
+        <div class="vf-corner tr"></div>
+        <div class="vf-corner bl"></div>
+        <div class="vf-corner br"></div>
+        <div class="vf-laser-line"></div>
+        <div id="qr-svg-wrapper" class="qr-code-display"></div>
+      </div>
+
+      <div class="ticket-code-showcase">
+        <span class="ticket-code-label">Unguessable Access Code</span>
+        <div class="ticket-code-large" id="qr-modal-code">------</div>
+      </div>
+
+      <div class="modal-action-buttons">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-qr-code">
+          📋 Copy Code
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-download-qr-ticket">
+          💾 Save Pass Card
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-test-checkin-modal">
+          🚪 Test Door Check-In
+        </button>
       </div>
     </div>
   </div>
@@ -155,6 +192,50 @@
         <div class="live-pulse" title="Live background sync active every 4 seconds">
           <span class="pulse-dot"></span>
           <span>Live Availability Sync</span>
+        </div>
+      </div>
+
+      <!-- High-Impact Athletic Hero Banner -->
+      <div class="hero-showcase">
+        <div class="hero-content">
+          <div class="hero-tag">
+            <span class="pulse-dot"></span>
+            <span>HIGH-INTENSITY TRAINING & SMART ACCESS</span>
+          </div>
+          <h1 class="hero-title">Atomic Booking. <span class="gradient-text">Zero Overbooking.</span></h1>
+          <p class="hero-subtitle">
+            Book 1-hour sessions with mathematically guaranteed 20-person capacity locks, automated FIFO waitlist standby promotion, and cryptographically secure door check-in QR passes.
+          </p>
+          <div class="hero-stats-row">
+            <div class="hero-stat-pill">
+              <span class="stat-pill-icon">🛡️</span>
+              <div>
+                <strong>Strict 20-Seat Cap</strong>
+                <small>ACID write-locked</small>
+              </div>
+            </div>
+            <div class="hero-stat-pill">
+              <span class="stat-pill-icon">⚡</span>
+              <div>
+                <strong>Auto Waitlist</strong>
+                <small>Instant standby promotion</small>
+              </div>
+            </div>
+            <div class="hero-stat-pill">
+              <span class="stat-pill-icon">📱</span>
+              <div>
+                <strong>Real ISO/IEC QR</strong>
+                <small>Phone camera scannable</small>
+              </div>
+            </div>
+            <div class="hero-stat-pill">
+              <span class="stat-pill-icon">🚪</span>
+              <div>
+                <strong>1-Hr Time Gate</strong>
+                <small>Door window security</small>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -388,6 +469,7 @@
     <p>PULSE GYM &copy; 2026. Built with Python 3.13, SQLite (ACID Immediate Transactions), and Modern Vanilla ES6.</p>
   </footer>
 
+  <script src="/js/qr-engine.js"></script>
   <script src="/js/app.js" type="module"></script>
 </body>
 </html>

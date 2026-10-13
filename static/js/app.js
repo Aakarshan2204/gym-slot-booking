@@ -40,6 +40,28 @@ const state = {
 class SoundEffects {
   constructor() {
     this.ctx = null;
+    this.enabled = localStorage.getItem("pulse_sound") !== "false";
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    localStorage.setItem("pulse_sound", this.enabled ? "true" : "false");
+    this.updateUI();
+    return this.enabled;
+  }
+
+  updateUI() {
+    const btn = document.getElementById("btn-sound-toggle");
+    const label = document.getElementById("sound-toggle-label");
+    if (btn && label) {
+      if (this.enabled) {
+        btn.classList.remove("muted");
+        label.textContent = "Sound: ON";
+      } else {
+        btn.classList.add("muted");
+        label.textContent = "Sound: OFF";
+      }
+    }
   }
 
   init() {
@@ -49,7 +71,34 @@ class SoundEffects {
     }
   }
 
+  playClick() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === "suspended") this.ctx.resume();
+
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(1000, now + 0.06);
+
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch (_) {}
+  }
+
   playSuccess() {
+    if (!this.enabled) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -84,6 +133,7 @@ class SoundEffects {
   }
 
   playError() {
+    if (!this.enabled) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -148,62 +198,22 @@ function showToast(message, type = "info", duration = 4000) {
 }
 
 // ============================================================================
-// Standalone SVG QR Code Generator
-// Generates clean pixel matrix without external network dependencies
+// Real ISO/IEC 18004 Standard QR Code Generator Interface
+// Connects to window.QRCodeEngine (pure JS, offline compliant, smartphone scannable)
 // ============================================================================
 function generateQRCodeSVG(text, size = 180) {
-  // Simple deterministic pattern generator using text hash for visual fidelity
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    hash = (hash << 5) - hash + text.charCodeAt(i);
-    hash |= 0;
+  if (window.QRCodeEngine && typeof window.QRCodeEngine.generateSVG === "function") {
+    return window.QRCodeEngine.generateSVG(text, {
+      size: size,
+      margin: 2,
+      darkColor: "#070b12",
+      lightColor: "#ffffff"
+    });
   }
-
-  const grid = 21; // 21x21 QR standard
-  const cellSize = size / grid;
-  let rects = "";
-
-  // Finder patterns at three corners (Top-Left, Top-Right, Bottom-Left)
-  const isFinder = (r, c) => {
-    return (
-      (r < 7 && c < 7) ||
-      (r < 7 && c >= grid - 7) ||
-      (r >= grid - 7 && c < 7)
-    );
-  };
-
-  const isFinderFilled = (r, c) => {
-    // 7x7 outer border and 3x3 inner core
-    const checkCorner = (or, oc) => {
-      const lr = r - or;
-      const lc = c - oc;
-      if (lr < 0 || lr > 6 || lc < 0 || lc > 6) return false;
-      if (lr === 0 || lr === 6 || lc === 0 || lc === 6) return true;
-      if (lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4) return true;
-      return false;
-    };
-    return checkCorner(0, 0) || checkCorner(0, grid - 7) || checkCorner(grid - 7, 0);
-  };
-
-  for (let r = 0; r < grid; r++) {
-    for (let c = 0; c < grid; c++) {
-      let filled = false;
-      if (isFinder(r, c)) {
-        filled = isFinderFilled(r, c);
-      } else {
-        // Pseudo-random data modules derived from text hash and coordinates
-        const val = Math.sin(hash + r * 13 + c * 37) * 10000;
-        filled = (val - Math.floor(val)) > 0.45;
-      }
-
-      if (filled) {
-        rects += `<rect x="${(c * cellSize).toFixed(1)}" y="${(r * cellSize).toFixed(1)}" width="${cellSize.toFixed(1)}" height="${cellSize.toFixed(1)}" fill="#000" />`;
-      }
-    }
-  }
-
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" style="border-radius: 6px; background: white; padding: 6px;">
-    ${rects}
+  // Safe SVG fallback
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" style="border-radius: 8px; background: white; padding: 6px;">
+    <rect width="${size}" height="${size}" fill="#fff"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="#000" font-family="sans-serif">QR Loading...</text>
   </svg>`;
 }
 
@@ -278,6 +288,15 @@ function updateNavUserUI() {
   const navMyBookings = document.getElementById("nav-item-my-bookings");
   const navAdmin = document.getElementById("nav-item-admin");
 
+  // Highlight active demo persona chip if logged in
+  document.querySelectorAll(".demo-chip").forEach(chip => {
+    if (state.user && chip.getAttribute("data-email") === state.user.email) {
+      chip.classList.add("active-user");
+    } else {
+      chip.classList.remove("active-user");
+    }
+  });
+
   if (!state.token || !state.user) {
     navSessions.classList.add("hidden");
     navMyBookings.classList.add("hidden");
@@ -307,7 +326,7 @@ function updateNavUserUI() {
     <button type="button" class="btn btn-secondary btn-sm" id="btn-logout" title="Log Out">Log Out</button>
   `;
 
-  document.getElementById("btn-logout")?.addEventListener("click", logout);
+  document.getElementById("btn-logout")?.addEventListener("click", () => logout(true));
 }
 
 // ============================================================================
@@ -600,9 +619,14 @@ function renderSessionsCards() {
     const seatsLeft = session.seats_remaining;
     const percent = Math.min(100, Math.round((session.confirmed_count / session.capacity) * 100));
 
+    const todayStr = getTodayISO();
+    const currentHour = new Date().getHours();
+    const isHappeningNow = session.date === todayStr && session.start_hour === currentHour;
+
     // Card status classes
     const cardClass = [
       "session-card",
+      isHappeningNow ? "active-now" : "",
       isBooked ? "booked" : "",
       isWaitlisted ? "waitlisted" : "",
       isFull ? "full-session" : ""
@@ -656,15 +680,18 @@ function renderSessionsCards() {
               </div>
               <div class="session-date">${formatDate(session.date)}</div>
             </div>
-            ${
-              isBooked
-                ? `<span class="badge badge-confirmed">Booked</span>`
-                : isWaitlisted
-                ? `<span class="badge badge-waitlist">Waitlist #${session.user_waitlist_position}</span>`
-                : isFull
-                ? `<span class="badge badge-full">Full</span>`
-                : `<span class="badge badge-confirmed">${seatsLeft} Seats Open</span>`
-            }
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+              ${isHappeningNow ? `<span class="badge badge-live">🔥 Active Now</span>` : ""}
+              ${
+                isBooked
+                  ? `<span class="badge badge-confirmed">Booked</span>`
+                  : isWaitlisted
+                  ? `<span class="badge badge-waitlist">Waitlist #${session.user_waitlist_position}</span>`
+                  : isFull
+                  ? `<span class="badge badge-full">Sold Out</span>`
+                  : `<span class="badge badge-confirmed">${seatsLeft} Seats Open</span>`
+              }
+            </div>
           </div>
 
           <!-- Capacity Meter -->
@@ -950,9 +977,9 @@ function renderMyConfirmedList(bookings) {
         <div class="ticket-code-panel">
           <span class="ticket-code-label">Door Access Code</span>
           <div class="ticket-code">${escapeHtml(b.check_in_code)}</div>
-          <button type="button" class="qr-preview btn-view-qr" data-code="${b.check_in_code}" title="View QR Ticket">
-            ${generateQRCodeSVG(b.check_in_code, 70)}
-            <span style="display: block; font-size: 0.65rem; color: #333; font-weight: 700; margin-top: 2px;">Click to Enlarge</span>
+          <button type="button" class="qr-preview btn-view-qr" data-code="${b.check_in_code}" data-date="${b.session_date}" data-hour="${b.session_start_hour}" title="View Scannable QR Ticket">
+            ${generateQRCodeSVG(b.check_in_code, 74)}
+            <span style="display: block; font-size: 0.65rem; color: #070b12; font-weight: 800; margin-top: 3px;">Open Pass</span>
           </button>
         </div>
       </article>
@@ -994,7 +1021,13 @@ function renderMyConfirmedList(bookings) {
   document.querySelectorAll(".btn-view-qr").forEach(btn => {
     btn.addEventListener("click", () => {
       const code = btn.getAttribute("data-code");
-      openQRModal(code);
+      const date = btn.getAttribute("data-date");
+      const hour = btn.getAttribute("data-hour");
+      openQRModal(code, {
+        userName: state.user?.name,
+        date: date,
+        time: hour ? `${String(hour).padStart(2, "0")}:00` : ""
+      });
     });
   });
 }
@@ -1091,20 +1124,130 @@ function startCountdownUpdater() {
   state.countdownTimer = setInterval(update, 1000);
 }
 
-// QR Modal Handler
-function openQRModal(code) {
+// QR Modal & VIP Pass Handlers
+function openQRModal(code, sessionInfo = null) {
   const modal = document.getElementById("qr-modal");
   const codeEl = document.getElementById("qr-modal-code");
   const wrapper = document.getElementById("qr-svg-wrapper");
+  const subEl = document.getElementById("qr-modal-subtitle");
 
+  state.currentQRModalCode = code;
   codeEl.textContent = code;
-  wrapper.innerHTML = generateQRCodeSVG(code, 180);
+
+  if (subEl) {
+    if (sessionInfo) {
+      subEl.innerHTML = `Valid for <strong>${escapeHtml(sessionInfo.userName || state.user?.name || "Member")}</strong> • Session on <strong>${sessionInfo.date || ""} at ${sessionInfo.time || ""}</strong>`;
+    } else {
+      subEl.textContent = "Scan with your smartphone camera or turnstile reader during your 1-hour session window:";
+    }
+  }
+
+  // Generate ISO/IEC 18004 Standard compliant QR Code (210px)
+  wrapper.innerHTML = generateQRCodeSVG(code, 210);
   modal.classList.add("open");
+  sounds.playClick();
 }
 
 function closeQRModal() {
   const modal = document.getElementById("qr-modal");
   modal.classList.remove("open");
+}
+
+function downloadPassTicket(code) {
+  if (!window.QRCodeEngine) {
+    showToast("QR Engine loading...", "info");
+    return;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = 420;
+  canvas.height = 560;
+  const ctx = canvas.getContext("2d");
+
+  // Dark background with gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, 560);
+  bgGrad.addColorStop(0, "#101827");
+  bgGrad.addColorStop(1, "#070b12");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 420, 560);
+
+  // Top Neon Accent Bar
+  const barGrad = ctx.createLinearGradient(0, 0, 420, 0);
+  barGrad.addColorStop(0, "#00f076");
+  barGrad.addColorStop(1, "#00e5ff");
+  ctx.fillStyle = barGrad;
+  ctx.fillRect(0, 0, 420, 6);
+
+  // Border
+  ctx.strokeStyle = "rgba(0, 240, 118, 0.3)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(10, 10, 400, 540);
+
+  // Header Title
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 20px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("PULSE GYM // VIP PASS", 210, 48);
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "12px sans-serif";
+  ctx.fillText("Guaranteed 20-Person Max Capacity Slot", 210, 70);
+
+  // Member & Pass Info
+  ctx.fillStyle = "#00f076";
+  ctx.font = "bold 13px sans-serif";
+  ctx.fillText(`MEMBER: ${state.user?.name || "VIP Member"}`, 210, 100);
+
+  // Render QR Code onto temporary canvas
+  const qrCanvas = document.createElement("canvas");
+  window.QRCodeEngine.renderToCanvas(qrCanvas, code, {
+    size: 240,
+    margin: 2,
+    darkColor: "#070b12",
+    lightColor: "#ffffff"
+  });
+
+  // White Card backing for QR
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(80, 125, 260, 260, 12);
+  } else {
+    ctx.rect(80, 125, 260, 260);
+  }
+  ctx.fill();
+
+  ctx.drawImage(qrCanvas, 90, 135, 240, 240);
+
+  // Access Code Box
+  ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+  ctx.fillRect(40, 410, 340, 64);
+  ctx.strokeStyle = "rgba(0, 240, 118, 0.4)";
+  ctx.strokeRect(40, 410, 340, 64);
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "11px sans-serif";
+  ctx.fillText("DOOR CHECK-IN CODE", 210, 430);
+
+  ctx.fillStyle = "#00f076";
+  ctx.font = "bold 28px monospace";
+  ctx.fillText(code, 210, 460);
+
+  // Footer Note
+  ctx.fillStyle = "#64748b";
+  ctx.font = "10px sans-serif";
+  ctx.fillText("Valid once only during session 1-hour window.", 210, 508);
+  ctx.fillText("https://github.com/Aakarshan2204/gym-slot-booking", 210, 526);
+
+  // Download Trigger
+  const link = document.createElement("a");
+  link.download = `pulse-pass-${code}.png`;
+  link.href = canvas.toDataURL("image/png");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  showToast(`VIP Door Pass saved to downloads!`, "success");
+  sounds.playSuccess();
 }
 
 // ============================================================================
@@ -1203,7 +1346,7 @@ async function loadSessionRoster(sessionId) {
                         ? `<span class="badge badge-confirmed">✓ Present (${new Date(b.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})</span>`
                         : b.status === "cancelled"
                         ? `<span class="badge badge-full">Cancelled</span>`
-                        : `<span style="color: var(--text-muted); font-size: 0.85rem;">Pending Check-in</span>`
+                        : `<button type="button" class="btn-quick-checkin" data-code="${b.check_in_code}">⚡ Check In</button>`
                     }
                   </td>
                 </tr>
@@ -1241,6 +1384,19 @@ async function loadSessionRoster(sessionId) {
           `
       }
     `;
+
+    // Attach quick check-in button listeners
+    content.querySelectorAll(".btn-quick-checkin").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const code = btn.getAttribute("data-code");
+        const input = document.getElementById("admin-checkin-code");
+        if (input) {
+          input.value = code;
+          sounds.playClick();
+          document.getElementById("admin-checkin-form")?.requestSubmit();
+        }
+      });
+    });
   } catch (err) {
     loading.style.display = "none";
     content.innerHTML = `<p style="color: #fb7185;">Failed to load roster: ${escapeHtml(err.message)}</p>`;
@@ -1372,15 +1528,71 @@ function formatDate(dateStr) {
 // Application Bootstrap
 // ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
+  sounds.updateUI();
   updateNavUserUI();
   setupAuthEventListeners();
   setupSessionsFilterListeners();
   setupAdminEventListeners();
 
+  // Sound toggle listener
+  document.getElementById("btn-sound-toggle")?.addEventListener("click", () => {
+    sounds.toggle();
+    sounds.playClick();
+  });
+
   // QR Modal close listener
   document.getElementById("qr-modal-close")?.addEventListener("click", closeQRModal);
   document.getElementById("qr-modal")?.addEventListener("click", (e) => {
     if (e.target.id === "qr-modal") closeQRModal();
+  });
+
+  // QR Modal Action Buttons
+  document.getElementById("btn-copy-qr-code")?.addEventListener("click", () => {
+    const code = state.currentQRModalCode;
+    if (!code) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(() => {
+        showToast(`Access code ${code} copied to clipboard!`, "success");
+        sounds.playClick();
+      }).catch(() => {
+        showToast(`Code: ${code}`, "info");
+      });
+    } else {
+      showToast(`Code: ${code}`, "info");
+    }
+  });
+
+  document.getElementById("btn-download-qr-ticket")?.addEventListener("click", () => {
+    const code = state.currentQRModalCode;
+    if (!code) return;
+    downloadPassTicket(code);
+  });
+
+  document.getElementById("btn-test-checkin-modal")?.addEventListener("click", async () => {
+    const code = state.currentQRModalCode;
+    if (!code) return;
+    closeQRModal();
+
+    if (state.user?.role !== "admin") {
+      try {
+        const data = await apiRequest("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ email: "admin@gympulse.com", password: "AdminPass123!" })
+        });
+        setAuth(data.token, data.user);
+        showToast("Switched to Admin reception desk to test check-in...", "info");
+      } catch (_) {}
+    }
+
+    navigateTo("#admin");
+    setTimeout(() => {
+      const input = document.getElementById("admin-checkin-code");
+      if (input) {
+        input.value = code;
+        sounds.playClick();
+        document.getElementById("admin-checkin-form")?.requestSubmit();
+      }
+    }, 250);
   });
 
   // Router listener

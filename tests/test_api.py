@@ -43,9 +43,16 @@ class TestGymSlotBooking(unittest.TestCase):
         # Start background server
         cls.server_thread = threading.Thread(target=run_server, daemon=True)
         cls.server_thread.start()
-        time.sleep(0.5)  # Let server bind
-
         cls.base_url = "http://127.0.0.1:8001"
+
+        # Wait until server is responsive and finished auto-seeding
+        for _ in range(60):
+            try:
+                with urlopen(f"{cls.base_url}/api/auth/demo-accounts", timeout=0.5) as r:
+                    if r.status == 200:
+                        break
+            except Exception:
+                time.sleep(0.1)
 
     @classmethod
     def tearDownClass(cls):
@@ -295,40 +302,50 @@ class TestGymSlotBooking(unittest.TestCase):
         today_str = now.date().isoformat()
 
         with database.get_db() as conn:
-            # Create active session right now
+            # Create active session right now if not existing
             st = datetime.datetime(now.year, now.month, now.day, current_hour, 0, 0)
             et = st + datetime.timedelta(hours=1)
-            conn.execute("""
-                INSERT INTO sessions (date, start_hour, start_time, end_time, capacity, created_by)
-                VALUES (?, ?, ?, ?, 20, 1)
-            """, (today_str, current_hour, st.isoformat(), et.isoformat()))
-            active_s_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+            existing_act = conn.execute("SELECT id FROM sessions WHERE date = ? AND start_hour = ?", (today_str, current_hour)).fetchone()
+            if existing_act:
+                active_s_id = existing_act[0]
+            else:
+                conn.execute("""
+                    INSERT INTO sessions (date, start_hour, start_time, end_time, capacity, created_by)
+                    VALUES (?, ?, ?, ?, 20, 1)
+                """, (today_str, current_hour, st.isoformat(), et.isoformat()))
+                active_s_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
             # Add confirmed booking
             code_valid = "VAL999"
             conn.execute("""
-                INSERT INTO bookings (session_id, user_id, status, check_in_code, created_at, updated_at)
+                INSERT OR REPLACE INTO bookings (session_id, user_id, status, check_in_code, created_at, updated_at)
                 VALUES (?, 1, 'confirmed', ?, ?, ?)
             """, (active_s_id, code_valid, now.isoformat(), now.isoformat()))
 
             # Add cancelled booking
             code_cancelled = "CAN999"
             conn.execute("""
-                INSERT INTO bookings (session_id, user_id, status, check_in_code, created_at, updated_at)
-                VALUES (?, 1, 'cancelled', ?, ?, ?)
+                INSERT OR REPLACE INTO bookings (session_id, user_id, status, check_in_code, created_at, updated_at)
+                VALUES (?, 2, 'cancelled', ?, ?, ?)
             """, (active_s_id, code_cancelled, now.isoformat(), now.isoformat()))
 
             # Add booking for session in future (starts 4 hours from now)
+            fut_hour = (current_hour + 4) % 24
             st_fut = st + datetime.timedelta(hours=4)
             et_fut = et + datetime.timedelta(hours=4)
-            conn.execute("""
-                INSERT INTO sessions (date, start_hour, start_time, end_time, capacity, created_by)
-                VALUES (?, ?, ?, ?, 20, 1)
-            """, (today_str, (current_hour + 4) % 24, st_fut.isoformat(), et_fut.isoformat()))
-            fut_s_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+            existing_fut = conn.execute("SELECT id FROM sessions WHERE date = ? AND start_hour = ?", (today_str, fut_hour)).fetchone()
+            if existing_fut:
+                fut_s_id = existing_fut[0]
+            else:
+                conn.execute("""
+                    INSERT INTO sessions (date, start_hour, start_time, end_time, capacity, created_by)
+                    VALUES (?, ?, ?, ?, 20, 1)
+                """, (today_str, fut_hour, st_fut.isoformat(), et_fut.isoformat()))
+                fut_s_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+
             code_future = "FUT999"
             conn.execute("""
-                INSERT INTO bookings (session_id, user_id, status, check_in_code, created_at, updated_at)
+                INSERT OR REPLACE INTO bookings (session_id, user_id, status, check_in_code, created_at, updated_at)
                 VALUES (?, 1, 'confirmed', ?, ?, ?)
             """, (fut_s_id, code_future, now.isoformat(), now.isoformat()))
 
