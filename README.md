@@ -3,6 +3,9 @@
 > **Take-Home Challenge Implementation**  
 > A high-concurrency gym session booking system that eliminates overbooking and doorstep arguments through atomic seat reservations, automated FIFO waitlist promotions, and cryptographically unguessable check-in passes.
 
+[![Latest Release](https://img.shields.io/github/v/release/Aakarshan2204/gym-slot-booking?color=10b981&label=Latest%20Version)](https://github.com/Aakarshan2204/gym-slot-booking/releases)
+[![Changelog](https://img.shields.io/badge/Changelog-Keep%20a%20Changelog-3b82f6)](CHANGELOG.md)
+
 ---
 
 ## 1. Design Note (Stack & Data Model)
@@ -21,14 +24,15 @@ Concurrency: All booking and cancellation operations execute inside SQLite BEGIN
 
 ## 2. Quick Start & How to Run
 
-### Prerequisites
-- Python 3.9+ (Python 3.13 tested)
+### Option A: 1-Click Launch (Windows)
+Simply double-click **`start.bat`**.  
+It will automatically launch `server.py` and open `http://localhost:8000` in your default browser.
 
-### 1-Step Installation & Launch
+### Option B: Manual Launch (Terminal)
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd Byte
+git clone https://github.com/Aakarshan2204/gym-slot-booking.git
+cd gym-slot-booking
 
 # (Optional) Install dependencies for bcrypt & pyjwt if not already installed
 pip install bcrypt pyjwt
