@@ -13,9 +13,19 @@
 // ============================================================================
 // State Management & Constants
 // ============================================================================
+let savedUser = null;
+try {
+  const rawUser = localStorage.getItem("pulse_user");
+  if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
+    savedUser = JSON.parse(rawUser);
+  }
+} catch (_) {
+  savedUser = null;
+}
+
 const state = {
   token: localStorage.getItem("pulse_token") || null,
-  user: JSON.parse(localStorage.getItem("pulse_user") || "null"),
+  user: savedUser,
   sessions: [],
   selectedDate: null,
   filterStatus: "all",
@@ -231,8 +241,8 @@ async function apiRequest(endpoint, options = {}) {
   } catch (error) {
     if (error.status === 401 && state.token) {
       // Token expired or invalid
-      showToast("Session expired. Please log in again.", "error");
-      logout();
+      logout(false);
+      showToast("Session expired. Please log in again.", "info");
     }
     throw error;
   }
@@ -249,7 +259,7 @@ function setAuth(token, user) {
   updateNavUserUI();
 }
 
-function logout() {
+function logout(notify = true) {
   state.token = null;
   state.user = null;
   localStorage.removeItem("pulse_token");
@@ -257,7 +267,9 @@ function logout() {
   stopPolling();
   updateNavUserUI();
   navigateTo("#login");
-  showToast("You have been logged out.", "info");
+  if (notify) {
+    showToast("You have been logged out.", "info");
+  }
 }
 
 function updateNavUserUI() {
@@ -550,7 +562,7 @@ async function fetchSessions(isPolling = false) {
     renderSessionsCards();
   } catch (err) {
     loading.style.display = "none";
-    if (!isPolling) {
+    if (!isPolling && state.token) {
       errorBox.style.display = "flex";
       document.getElementById("sessions-error-msg").textContent = err.message || "Failed to load sessions.";
     }
