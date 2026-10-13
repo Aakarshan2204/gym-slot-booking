@@ -501,6 +501,7 @@ class GymRequestHandler(BaseHTTPRequestHandler):
     # ===================================================
     def _get_sessions_list(self, user_id: int, date_filter: Optional[str]) -> list:
         """Retrieves sessions with live remaining seat counts and user booking states."""
+        ensure_current_sessions()
         now_iso = datetime.datetime.now().isoformat()
         with get_db() as conn:
             cursor = conn.cursor()
@@ -1052,8 +1053,24 @@ class GymRequestHandler(BaseHTTPRequestHandler):
                 "utilization_rate": round(utilization_rate, 1)
             }
 
+def ensure_current_sessions():
+    """Ensures there are always active sessions for today and upcoming dates."""
+    today_str = datetime.date.today().isoformat()
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM sessions WHERE date >= ?", (today_str,))
+            count = cursor.fetchone()[0]
+            if count == 0:
+                print(f"[AUTO-SEED] No active sessions found on or after {today_str}. Seeding fresh session data...")
+                from seed import seed_database
+                seed_database()
+    except Exception as e:
+        print(f"[AUTO-SEED NOTICE] {repr(e)}")
+
 def run_server():
     init_db()
+    ensure_current_sessions()
     server_address = (HOST, PORT)
     httpd = ThreadingHTTPServer(server_address, GymRequestHandler)
     print(f"============================================================")
