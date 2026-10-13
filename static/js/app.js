@@ -298,7 +298,8 @@ function updateNavUserUI() {
   });
 
   if (!state.token || !state.user) {
-    navSessions.classList.add("hidden");
+    // Keep Sessions tab visible for guests so anyone can explore available slots
+    navSessions.classList.remove("hidden");
     navMyBookings.classList.add("hidden");
     navAdmin.classList.add("hidden");
     navUserPanel.innerHTML = `
@@ -352,8 +353,17 @@ function handleRouting() {
 
   // Route Guard: Authentication checks
   if (!state.token) {
-    hash = "#login";
+    if (hash === "#my-bookings") {
+      showToast("Please log in to view your bookings.", "info");
+      hash = "#login";
+    } else if (hash === "#admin") {
+      showToast("Admin access requires logging in.", "info");
+      hash = "#login";
+    } else if (hash !== "#login" && hash !== "#sessions") {
+      hash = "#sessions";
+    }
   } else if (hash === "#login") {
+    // Already logged in, direct straight to sessions
     hash = "#sessions";
   } else if (hash === "#admin" && state.user?.role !== "admin") {
     // "A member cannot open the admin page."
@@ -581,11 +591,28 @@ async function fetchSessions(isPolling = false) {
     renderSessionsCards();
   } catch (err) {
     loading.style.display = "none";
-    if (!isPolling && state.token) {
+    if (!isPolling) {
       errorBox.style.display = "flex";
       document.getElementById("sessions-error-msg").textContent = err.message || "Failed to load sessions.";
     }
   }
+}
+
+function getTodayISO() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getTomorrowISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function renderSessionsCards() {
@@ -729,6 +756,13 @@ function attachSessionButtonListeners() {
   // 1. Optimistic Booking Action
   document.querySelectorAll(".btn-book").forEach(btn => {
     btn.addEventListener("click", async () => {
+      if (!state.token) {
+        if (typeof sounds !== "undefined") sounds.playClick();
+        showToast("Please log in or select a demo account to reserve a session.", "info", 4000);
+        navigateTo("#login");
+        return;
+      }
+
       const sessionId = parseInt(btn.getAttribute("data-session-id"), 10);
       const session = state.sessions.find(s => s.id === sessionId);
       if (!session) return;
@@ -776,6 +810,13 @@ function attachSessionButtonListeners() {
   // 2. Join Waitlist Action
   document.querySelectorAll(".btn-join-waitlist").forEach(btn => {
     btn.addEventListener("click", async () => {
+      if (!state.token) {
+        if (typeof sounds !== "undefined") sounds.playClick();
+        showToast("Please log in or select a demo account to join the waitlist.", "info", 4000);
+        navigateTo("#login");
+        return;
+      }
+
       const sessionId = parseInt(btn.getAttribute("data-session-id"), 10);
       btn.disabled = true;
       btn.textContent = "Joining...";
@@ -822,11 +863,6 @@ function setupSessionsFilterListeners() {
   const btnClearDate = document.getElementById("btn-clear-date");
   const btnRetry = document.getElementById("btn-retry-sessions");
 
-  const todayStr = new Date().toISOString().split("T")[0];
-  const tomorrowDate = new Date();
-  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-  const tomorrowStr = tomorrowDate.toISOString().split("T")[0];
-
   filterDate.addEventListener("change", (e) => {
     state.selectedDate = e.target.value || null;
     fetchSessions();
@@ -838,12 +874,14 @@ function setupSessionsFilterListeners() {
   });
 
   btnToday.addEventListener("click", () => {
+    const todayStr = getTodayISO();
     filterDate.value = todayStr;
     state.selectedDate = todayStr;
     fetchSessions();
   });
 
   btnTomorrow.addEventListener("click", () => {
+    const tomorrowStr = getTomorrowISO();
     filterDate.value = tomorrowStr;
     state.selectedDate = tomorrowStr;
     fetchSessions();

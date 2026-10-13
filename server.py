@@ -261,11 +261,12 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             self.send_json({"user": user})
             return
 
-        # Protected: Browse sessions
+        # Browse sessions (publicly accessible, personalized if authenticated)
         if path == "/api/sessions":
-            user = self.get_current_user(required=True)
+            user = self.get_current_user(required=False)
+            user_id = user["id"] if user else None
             date_filter = query.get("date", [None])[0]
-            sessions = self._get_sessions_list(user["id"], date_filter)
+            sessions = self._get_sessions_list(user_id, date_filter)
             self.send_json({"sessions": sessions})
             return
 
@@ -499,7 +500,7 @@ class GymRequestHandler(BaseHTTPRequestHandler):
     # ===================================================
     # Core Domain Logic & Concurrency-Safe Operations
     # ===================================================
-    def _get_sessions_list(self, user_id: int, date_filter: Optional[str]) -> list:
+    def _get_sessions_list(self, user_id: Optional[int], date_filter: Optional[str]) -> list:
         """Retrieves sessions with live remaining seat counts and user booking states."""
         ensure_current_sessions()
         now_iso = datetime.datetime.now().isoformat()

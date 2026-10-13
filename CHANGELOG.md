@@ -4,6 +4,29 @@ All notable changes to the **PULSE GYM** Slot Booking & Door Check-In System wil
 
 The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`v<MAJOR>.<MINOR>.<PATCH>`).
 
+## [v1.2.1] - 2026-10-13
+
+### 🚀 Summary of Improvements Over v1.2.0
+Version 1.2.1 resolves a critical JavaScript runtime issue where gym session schedules were failing to render (`ReferenceError: getTodayISO is not defined`). It also introduces seamless public guest browsing, allowing visitors to inspect training schedules and capacity meters immediately without an upfront login requirement.
+
+### 🔍 Side-by-Side Comparison: What Improved from v1.2.0 to v1.2.1?
+
+| Area / Feature | In v1.2.0 | In v1.2.1 (Improved) | Real-World Impact |
+| :--- | :--- | :--- | :--- |
+| **Schedule Rendering** | Halted by runtime `ReferenceError: getTodayISO is not defined` inside card mapping. | **Zero-error rendering with localized date helpers** (`getTodayISO()`, `getTomorrowISO()`). | Session schedules, live indicators, and capacity bars render immediately on page load. |
+| **Public Timetable Access** | `GET /api/sessions` enforced `401 Unauthorized` for visitors; redirected guests away from `#sessions`. | **Open public timetable browsing**; unauthenticated guests can explore all session times and free spots. | Prospective members and visitors can freely explore schedules without having to register first. |
+| **Guest Reservation Prompt** | Threw unhandled 401 API errors if an unauthenticated user attempted an action. | Friendly informational toast directing visitors: *"Please log in or select a demo account to reserve a session"* with seamless transition to `#login`. | Smooth, intuitive user onboarding rather than jarring error messages. |
+| **Navigation Visibility** | "Browse Sessions" link was hidden when not logged in. | **"Browse Sessions" is prominently visible to all users**, guests and members alike. | Clear and standard website navigation hierarchy. |
+| **Filter Button Accuracy** | Date filters relied on UTC `.toISOString()`, causing timezone mismatches for users in UTC+ offsets. | Filters use **local calendar calculations**, accurately filtering for today's and tomorrow's real calendar slots. | Filter tabs (`Today`, `Tomorrow`) always correspond to the user's actual date. |
+
+### 🐛 Bug Fixes
+- **Frontend `getTodayISO` Definition (`app.js`)**: Defined `getTodayISO()` and `getTomorrowISO()` helpers to compute year-month-day strings in the client's local time zone.
+- **Backend Guest Access (`server.py`)**: Modified `GET /api/sessions` to accept optional authentication (`required=False`), safely querying sessions with SQL `NULL` for `user_id` when unauthenticated.
+- **Client Route Guard (`app.js`)**: Adjusted route guard so unauthenticated users visiting `/#sessions` remain on the session grid rather than being forced to `#login`. Protected views (`#my-bookings` and `#admin`) remain strictly guarded.
+- **Filter Date Synchronization (`app.js`)**: Fixed `btnToday` and `btnTomorrow` click listeners to use localized ISO strings and trigger immediate timetable re-renders.
+
+---
+
 ## [v1.2.0] - 2026-10-13
 
 ### 🚀 Summary of Improvements Over v1.1.0
