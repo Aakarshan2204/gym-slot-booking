@@ -218,6 +218,10 @@ class GymRequestHandler(BaseHTTPRequestHandler):
 
         # Sanitize path to prevent directory traversal
         clean_path = os.path.normpath(path.lstrip("/"))
+        if clean_path.startswith("static" + os.sep) or clean_path == "static":
+            clean_path = clean_path[len("static"):].lstrip(os.sep)
+        elif clean_path.startswith("static/"):
+            clean_path = clean_path[len("static/"):].lstrip("/")
         file_path = os.path.join(STATIC_DIR, clean_path)
 
         if not os.path.isfile(file_path):
