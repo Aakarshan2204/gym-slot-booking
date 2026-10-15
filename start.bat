@@ -5,10 +5,9 @@ echo ============================================================
 echo   PULSE GYM - Online Session Booking System
 echo ============================================================
 echo.
-echo Starting server on http://localhost:8000 ...
+echo Initializing database, scheduling sessions, and starting server...
+echo The browser will open automatically once the server is ready.
 echo (Keep this window open while using the website)
 echo.
-timeout /t 1 /nobreak >nul
-start "" "http://localhost:8000"
-py -3 server.py 2>nul || python server.py
+py -3 server.py || python server.py
 pause

@@ -4,6 +4,29 @@ All notable changes to the **PULSE GYM** Slot Booking & Door Check-In System wil
 
 The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`v<MAJOR>.<MINOR>.<PATCH>`).
 
+## [v1.2.2] - 2026-10-15
+
+### 🚀 Summary of Improvements Over v1.2.1
+Version 1.2.2 eliminates the root causes of startup and new-day failures. It completely overhauls the calendar rollover scheduling engine so that an active session is guaranteed for the current hour, upcoming slots exist for tonight and tomorrow, and a 7-day multi-day timetable is perpetually maintained. It also resolves cold-start `ERR_CONNECTION_REFUSED` errors by coordinating browser launch directly with HTTP socket readiness in `server.py` and `start.bat`, and adds diagnostic guidance if `index.html` is opened directly via `file:///`.
+
+### 🔍 Side-by-Side Comparison: What Improved from v1.2.1 to v1.2.2?
+
+| Area / Feature | In v1.2.1 | In v1.2.2 (Improved) | Real-World Impact |
+| :--- | :--- | :--- | :--- |
+| **New Day Schedule Refresh** | Stale date boundary check (`SELECT COUNT(*) WHERE date >= today`) caused auto-seeder to skip new days if past future sessions existed. Timetables showed all sessions as *"Session Ended"* with 0 slots for tomorrow. | **Idempotent Multi-Day Lifecycle Engine**: Guarantees active session for current hour, upcoming full session with waitlist, tomorrow sessions (9:00, 11:00, 18:00), and weekly split. | Every morning the user opens the site, it is **100% fresh, bookable, and populated with active slots**! |
+| **Active Live Check-In** | On calendar day rollover, demo member tickets were attached to past dates, breaking live door check-in testing. | **Guaranteed Active Now Slot**: Always provisions an active session for `now.hour` today and attaches a live confirmed pass for Sarah Connor. | Evaluators and users can immediately test the `🔥 Active Now` badge and door QR check-in on any day at any hour. |
+| **Cold-Start Launch Reliability** | `start.bat` opened browser after a fixed 1s timeout before Python bound port 8000, causing browser `ERR_CONNECTION_REFUSED` errors every morning. | **Socket-Bound Browser Launch**: Browser is launched via `webbrowser.open()` only **after** the TCP socket is bound and listening on port 8000. | Zero connection refused errors on opening `start.bat`. |
+| **Direct File Explorer Opening** | Opening `index.html` via `file:///` threw CORS and module errors, rendering a silent blank screen. | **Embedded Diagnostic File Protocol Guard**: Displays an informative, high-tech diagnostic modal instructing the user to launch `start.bat`. | Eliminates user confusion when opening HTML directly from Windows Explorer. |
+| **Live Rollover Awareness** | Server running overnight required manual restarts to populate new day sessions. | **Dynamic Sync on Browse**: `ensure_current_sessions()` runs automatically on timetable fetch (throttled to 30s) if the current hour or tomorrow are missing. | The application seamlessly self-heals across midnight transitions without server restarts. |
+
+### 🐛 Bug Fixes
+- **Calendar Boundary Evaluation (`server.py`)**: Fixed `ensure_current_sessions()` to verify that an active session exists for `(today, current_hour)` and at least one session exists for `tomorrow`, rather than a loose `>= today` check.
+- **Idempotent Schedule Seeder (`seed.py`)**: Removed rigid `today_session_count == 0` check; implemented `INSERT OR IGNORE` with session ID lookup and unique code generation so sessions are non-destructively supplemented rather than skipped.
+- **Startup Race Condition (`start.bat`)**: Replaced premature browser spawn in batch script with automated post-socket initialization in `server.py`.
+- **Diagnostic Guide for Direct Disk Access (`index.html`)**: Added a `<script>` guard at the top of `<head>` alerting users if launched via `file://`.
+
+---
+
 ## [v1.2.1] - 2026-10-13
 
 ### 🚀 Summary of Improvements Over v1.2.0

@@ -23,12 +23,183 @@ try {
   savedUser = null;
 }
 
+// ============================================================================
+// Weekly Muscle Target Split & Workout Media Configuration
+// ============================================================================
+const WEEKLY_SPLIT = {
+  Monday: {
+    day: "Monday",
+    muscle: "Chest",
+    badge: "Chest Day",
+    tagline: "Pectoral Hypertrophy & Upper Body Power",
+    icon: "💥",
+    color: "#00F076",
+    poster: "/images/poster_chest.jpg",
+    exercisePhoto: "/images/exercise_chest.jpg",
+    primaryExercise: "Flat Barbell Bench Press",
+    exercises: [
+      { name: "Flat Barbell Bench Press", sets: "4 Sets x 8-10 Reps", note: "Explosive press, controlled 3-second negative descent" },
+      { name: "Incline Dumbbell Press", sets: "3 Sets x 10-12 Reps", note: "Target upper clavicular pectoral head at 30° incline" },
+      { name: "Cable Standing Chest Flyes", sets: "3 Sets x 12-15 Reps", note: "Constant tension with full peak contraction at center" },
+      { name: "Weighted Dips / Pushups", sets: "3 Sets to Failure", note: "Lean torso forward 15° to recruit lower pecs" }
+    ],
+    targetMuscles: ["Pectoralis Major", "Pectoralis Minor", "Anterior Deltoids", "Triceps Brachii"],
+    intensity: "Very High (85-90% 1RM)",
+    estimatedBurn: "520 - 680 kcal",
+    isHoliday: false
+  },
+  Tuesday: {
+    day: "Tuesday",
+    muscle: "Back",
+    badge: "Back Day",
+    tagline: "V-Taper Lat Width, Trap Density & Spine Stability",
+    icon: "🦅",
+    color: "#38bdf8",
+    poster: "/images/poster_back.jpg",
+    exercisePhoto: "/images/exercise_back.jpg",
+    primaryExercise: "Bent-Over Barbell Rows",
+    exercises: [
+      { name: "Conventional Deadlifts", sets: "4 Sets x 5-6 Reps", note: "Full posterior chain drive with neutral spine lock" },
+      { name: "Bent-Over Barbell Rows", sets: "4 Sets x 8-10 Reps", note: "Pull to lower sternum, flare elbows slightly" },
+      { name: "Wide-Grip Lat Pulldowns", sets: "3 Sets x 10-12 Reps", note: "Drive elbows down and back for maximum lat stretch" },
+      { name: "Seated Cable Rows", sets: "3 Sets x 12-15 Reps", note: "Squeeze rhomboids and middle traps for 2 seconds" }
+    ],
+    targetMuscles: ["Latissimus Dorsi", "Trapezius", "Rhomboids", "Erector Spinae"],
+    intensity: "Extreme (90% 1RM)",
+    estimatedBurn: "580 - 750 kcal",
+    isHoliday: false
+  },
+  Wednesday: {
+    day: "Wednesday",
+    muscle: "Biceps and Triceps",
+    badge: "Biceps & Triceps",
+    tagline: "Arm Hypertrophy & Antagonist Super-Sets",
+    icon: "💪",
+    color: "#c084fc",
+    poster: "/images/poster_arms.jpg",
+    exercisePhoto: "/images/exercise_arms.jpg",
+    primaryExercise: "Standing Dumbbell Bicep Curls",
+    exercises: [
+      { name: "Standing Dumbbell Bicep Curls", sets: "4 Sets x 10-12 Reps", note: "Strict supination at top of movement with zero body swing" },
+      { name: "Cable Tricep Rope Pushdowns", sets: "4 Sets x 12-15 Reps", note: "Spread ropes at bottom to lock out tricep lateral head" },
+      { name: "Incline Dumbbell Hammer Curls", sets: "3 Sets x 10-12 Reps", note: "Build brachialis and forearm thickness" },
+      { name: "EZ-Bar Skull Crushers", sets: "3 Sets x 10-12 Reps", note: "Lower behind head to emphasize triceps long head" }
+    ],
+    targetMuscles: ["Biceps Brachii", "Triceps Brachii", "Brachialis", "Forearm Flexors"],
+    intensity: "High (Hypertrophy / High Volume)",
+    estimatedBurn: "450 - 580 kcal",
+    isHoliday: false
+  },
+  Thursday: {
+    day: "Thursday",
+    muscle: "Shoulders",
+    badge: "Shoulders Day",
+    tagline: "3D Deltoid Caps & Overhead Power",
+    icon: "🛡️",
+    color: "#fbbf24",
+    poster: "/images/poster_shoulders.jpg",
+    exercisePhoto: "/images/exercise_shoulders.jpg",
+    primaryExercise: "Seated Dumbbell Shoulder Press",
+    exercises: [
+      { name: "Seated Overhead Dumbbell Press", sets: "4 Sets x 8-10 Reps", note: "Full range of motion, press slightly inward at lockout" },
+      { name: "Dumbbell Lateral Raises", sets: "4 Sets x 12-15 Reps", note: "Lead with elbows for targeted lateral delt isolation" },
+      { name: "Rear Delt Face Pulls", sets: "3 Sets x 15 Reps", note: "External rotation at finish for healthy rotator cuffs" },
+      { name: "Barbell Shrugs", sets: "3 Sets x 12 Reps", note: "Controlled vertical contraction of upper trapezius"}
+    ],
+    targetMuscles: ["Anterior Deltoids", "Lateral Deltoids", "Posterior Deltoids", "Rotator Cuffs"],
+    intensity: "High (Strength & Shape)",
+    estimatedBurn: "480 - 620 kcal",
+    isHoliday: false
+  },
+  Friday: {
+    day: "Friday",
+    muscle: "Cardio",
+    badge: "Cardio & HIIT",
+    tagline: "Cardiovascular Endurance, V02 Max & Fat Oxidation",
+    icon: "⚡",
+    color: "#f43f5e",
+    poster: "/images/poster_cardio.jpg",
+    exercisePhoto: "/images/exercise_cardio.jpg",
+    primaryExercise: "Curved Treadmill Interval Sprints",
+    exercises: [
+      { name: "Woodway Curved Treadmill Sprints", sets: "8 Rounds x 30s Sprint / 30s Rest", note: "Maximum anaerobic wattage and posterior propulsion" },
+      { name: "Assault Fan Bike Tabata", sets: "6 Rounds x 20s Max / 10s Low", note: "Total body metabolic output and oxygen depletion" },
+      { name: "Concept2 Rowing Ergometer", sets: "5 x 500m Intervals", note: "Keep stroke rate at 28-30 spm with powerful hip drive" },
+      { name: "High-Speed Battle Ropes & Box Jumps", sets: "4 Sets x 45s", note: "Core stability, agility and explosive fast-twitch endurance" }
+    ],
+    targetMuscles: ["Heart & Lungs (VO2 Max)", "Calves & Hamstrings", "Core & Diaphragm"],
+    intensity: "Maximum (Heart Rate Zone 4 - 5)",
+    estimatedBurn: "650 - 900 kcal",
+    isHoliday: false
+  },
+  Saturday: {
+    day: "Saturday",
+    muscle: "Legs",
+    badge: "Legs Day",
+    tagline: "Quad Sweeps, Hamstring Power & Glute Strength",
+    icon: "🦵",
+    color: "#a3e635",
+    poster: "/images/poster_legs.jpg",
+    exercisePhoto: "/images/exercise_legs.jpg",
+    primaryExercise: "Heavy Barbell Back Squats",
+    exercises: [
+      { name: "Barbell Back Squats", sets: "5 Sets x 6-8 Reps", note: "Deep hip crease below parallel, drive through whole foot" },
+      { name: "Romanian Deadlifts (RDLs)", sets: "4 Sets x 8-10 Reps", note: "Hinge at hips for deep hamstring stretch and glute recruitment" },
+      { name: "Leg Press Machine", sets: "4 Sets x 10-12 Reps", note: "High foot placement for glutes or close stance for quad sweep" },
+      { name: "Standing Calf Raises", sets: "4 Sets x 15-20 Reps", note: "Full 2-second stretch at bottom and 1-second peak flex" }
+    ],
+    targetMuscles: ["Quadriceps", "Hamstrings", "Gluteus Maximus", "Gastrocnemius"],
+    intensity: "Brutal (Heavy Compound Lifting)",
+    estimatedBurn: "650 - 850 kcal",
+    isHoliday: false
+  },
+  Sunday: {
+    day: "Sunday",
+    muscle: "Holiday",
+    badge: "Gym Holiday - Rest & Recovery",
+    tagline: "Active Recovery, Central Nervous System Reset & Nutrition",
+    icon: "🧘",
+    color: "#38bdf8",
+    poster: "/images/poster_sunday_rest.jpg",
+    exercisePhoto: "/images/exercise_sunday_rest.jpg",
+    primaryExercise: "Foam Rolling, Mobility & Hydration",
+    exercises: [
+      { name: "Full Body Myofascial Foam Rolling", sets: "15-20 Minutes", note: "Target tight IT bands, lats, thoracic spine and calves" },
+      { name: "Dynamic Mobility & Hip Openers", sets: "10-15 Minutes", note: "Improve joint lubrication and prepare body for Monday" },
+      { name: "Gentle 30-min Outdoor Walk", sets: "Zone 1 Aerobic", note: "Flush metabolic waste without inducing fatigue" },
+      { name: "Electrolyte Hydration & High-Protein Meal Prep", sets: "All Day", note: "Replenish muscle glycogen and repair microtears" }
+    ],
+    targetMuscles: ["Central Nervous System (CNS)", "Connective Tissue", "Mind & Spirit"],
+    intensity: "Restorative (Active Recovery & Rest)",
+    estimatedBurn: "Maintenance Baseline",
+    isHoliday: true
+  }
+};
+
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function getSplitForDate(dateStr) {
+  if (!dateStr) return WEEKLY_SPLIT.Monday;
+  try {
+    const parts = dateStr.split("-");
+    const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    const dayName = DAY_NAMES[d.getDay()];
+    return WEEKLY_SPLIT[dayName] || WEEKLY_SPLIT.Monday;
+  } catch (_) {
+    return WEEKLY_SPLIT.Monday;
+  }
+}
+
+const currentDayName = DAY_NAMES[new Date().getDay()] || "Thursday";
+
 const state = {
   token: localStorage.getItem("pulse_token") || null,
   user: savedUser,
   sessions: [],
   selectedDate: null,
   filterStatus: "all",
+  selectedMuscle: "all",
+  activeSplitDay: currentDayName,
   pollingTimer: null,
   countdownTimer: null,
   adminRosterSessionId: null
@@ -618,6 +789,13 @@ function getTomorrowISO() {
 function renderSessionsCards() {
   const container = document.getElementById("sessions-container");
   const emptyBox = document.getElementById("sessions-empty");
+  const sundayNotice = document.getElementById("sunday-holiday-notice");
+
+  // Check if Sunday is filtered or selected
+  const isSundaySelected = state.selectedMuscle === "Holiday" || (state.selectedDate && new Date(state.selectedDate + "T00:00:00").getDay() === 0);
+  if (sundayNotice) {
+    sundayNotice.style.display = isSundaySelected ? "block" : "none";
+  }
 
   // Apply filter status
   let filtered = state.sessions;
@@ -627,8 +805,27 @@ function renderSessionsCards() {
     filtered = filtered.filter(s => s.seats_remaining === 0);
   }
 
+  // Apply muscle target filter
+  if (state.selectedMuscle !== "all") {
+    if (state.selectedMuscle === "Holiday") {
+      filtered = filtered.filter(s => {
+        const split = s.muscle_target || getSplitForDate(s.date);
+        return split.isHoliday || split.muscle === "Holiday";
+      });
+    } else {
+      filtered = filtered.filter(s => {
+        const split = s.muscle_target || getSplitForDate(s.date);
+        return split.muscle === state.selectedMuscle;
+      });
+    }
+  }
+
   if (filtered.length === 0) {
-    emptyBox.style.display = "block";
+    if (!isSundaySelected) {
+      emptyBox.style.display = "block";
+    } else {
+      emptyBox.style.display = "none";
+    }
     container.innerHTML = "";
     return;
   }
@@ -649,6 +846,9 @@ function renderSessionsCards() {
     const todayStr = getTodayISO();
     const currentHour = new Date().getHours();
     const isHappeningNow = session.date === todayStr && session.start_hour === currentHour;
+
+    // Daily Muscle Split Data
+    const muscleInfo = session.muscle_target || getSplitForDate(session.date);
 
     // Card status classes
     const cardClass = [
@@ -699,6 +899,18 @@ function renderSessionsCards() {
     return `
       <article class="${cardClass}" id="session-card-${session.id}">
         <div>
+          <!-- Muscle Target Strip -->
+          <div class="session-card-muscle-strip">
+            <span class="muscle-badge-pill" style="background: ${muscleInfo.color}22; color: ${muscleInfo.color}; border: 1px solid ${muscleInfo.color}55;">
+              ${muscleInfo.icon} ${muscleInfo.day}: ${muscleInfo.badge}
+            </span>
+            <button type="button" class="muscle-thumb-btn btn-open-exercise-preview"
+              data-day="${muscleInfo.day}"
+              title="Click to view ${muscleInfo.badge} exercise guide & poster">
+              <img src="${muscleInfo.exercisePhoto}" alt="${muscleInfo.badge}">
+            </button>
+          </div>
+
           <div class="session-header">
             <div>
               <div class="session-time">
@@ -719,6 +931,12 @@ function renderSessionsCards() {
                   : `<span class="badge badge-confirmed">${seatsLeft} Seats Open</span>`
               }
             </div>
+          </div>
+
+          <!-- Movement Focus Tag -->
+          <div style="font-size: 0.78rem; color: var(--text-secondary); margin: 6px 0 10px; display: flex; align-items: center; gap: 6px;">
+            <span>🎯</span>
+            <span><strong>Target:</strong> ${escapeHtml(muscleInfo.primaryExercise)}</span>
           </div>
 
           <!-- Capacity Meter -->
@@ -853,6 +1071,246 @@ function attachSessionButtonListeners() {
       }
     });
   });
+
+  // 4. Exercise Preview / Lightbox Modal Click from session card
+  document.querySelectorAll(".btn-open-exercise-preview").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const day = btn.getAttribute("data-day");
+      const split = WEEKLY_SPLIT[day] || WEEKLY_SPLIT.Monday;
+      state.activeSplitDay = day;
+      renderWeeklySplitSection(day);
+      openLightbox(
+        split.exercisePhoto,
+        `${split.day} Exercise: ${split.primaryExercise}`,
+        `${split.badge} Focus & Routine`,
+        split.badge,
+        `
+        <div style="margin-bottom: 8px;"><strong>Recommended Movements for ${split.day}:</strong></div>
+        <ul style="padding-left: 20px; margin: 0; line-height: 1.6;">
+          ${split.exercises.map(ex => `<li><strong>${escapeHtml(ex.name)}</strong>: ${escapeHtml(ex.sets)} — <em>${escapeHtml(ex.note)}</em></li>`).join("")}
+        </ul>
+        `
+      );
+    });
+  });
+}
+
+// ============================================================================
+// Lightbox Modal Functions (High-Resolution Visual Inspection)
+// ============================================================================
+function openLightbox(imgSrc, title, subtitle, badgeText, detailsHtml = "") {
+  const modal = document.getElementById("lightbox-modal");
+  const img = document.getElementById("lightbox-img");
+  const titleEl = document.getElementById("lightbox-title");
+  const capEl = document.getElementById("lightbox-caption");
+  const badgeEl = document.getElementById("lightbox-badge");
+  const detailsEl = document.getElementById("lightbox-details");
+
+  if (!modal) return;
+  if (img) img.src = imgSrc;
+  if (titleEl) titleEl.textContent = title || "Workout Visual";
+  if (capEl) capEl.textContent = subtitle || "";
+  if (badgeEl) badgeEl.textContent = badgeText || "Workout";
+  if (detailsEl) detailsEl.innerHTML = detailsHtml || "";
+
+  modal.classList.add("open");
+  if (typeof sounds !== "undefined") sounds.playClick();
+}
+
+function closeLightbox() {
+  const modal = document.getElementById("lightbox-modal");
+  if (modal) modal.classList.remove("open");
+}
+
+// ============================================================================
+// Weekly Training Split Section & Day Switching
+// ============================================================================
+function renderWeeklySplitSection(dayName = state.activeSplitDay) {
+  const container = document.getElementById("split-detail-container");
+  const todayBadge = document.getElementById("split-today-text");
+  if (!container) return;
+
+  state.activeSplitDay = dayName;
+  const split = WEEKLY_SPLIT[dayName] || WEEKLY_SPLIT.Monday;
+
+  // Update nav buttons active state
+  document.querySelectorAll(".split-day-btn").forEach(btn => {
+    const btnDay = btn.getAttribute("data-day");
+    btn.classList.toggle("active", btnDay === dayName);
+  });
+
+  // Update today indicator
+  const todayStrName = DAY_NAMES[new Date().getDay()] || "Thursday";
+  const todaySplit = WEEKLY_SPLIT[todayStrName] || WEEKLY_SPLIT.Thursday;
+  if (todayBadge) {
+    todayBadge.textContent = `Today: ${todaySplit.day} ${todaySplit.badge}`;
+  }
+
+  // Render detail card
+  container.innerHTML = `
+    <!-- Column 1: Cinematic Workout Poster -->
+    <div class="split-poster-side">
+      <div class="split-poster-wrapper" id="btn-split-poster-zoom" title="Click to view full-resolution poster">
+        <img src="${split.poster}" alt="${split.badge} Poster" class="split-poster-img">
+        <div class="split-poster-overlay">
+          <div class="split-poster-top">
+            <span class="split-poster-badge" style="border-color: ${split.color}; color: ${split.color};">
+              ${split.icon} ${split.badge.toUpperCase()}
+            </span>
+            <span class="split-zoom-hint">🔍 View Poster</span>
+          </div>
+          <div class="split-poster-bottom">
+            <div class="split-poster-title">${escapeHtml(split.day)}: ${escapeHtml(split.muscle)}</div>
+            <div class="split-poster-tagline">${escapeHtml(split.tagline)}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Specs Metadata Bar -->
+      <div class="split-meta-row">
+        <div class="split-meta-pill">
+          <span class="split-meta-label">Intensity Target</span>
+          <span class="split-meta-val" style="color: ${split.color};">${escapeHtml(split.intensity)}</span>
+        </div>
+        <div class="split-meta-pill">
+          <span class="split-meta-label">Est. Caloric Burn</span>
+          <span class="split-meta-val">${escapeHtml(split.estimatedBurn)}</span>
+        </div>
+        <div class="split-meta-pill">
+          <span class="split-meta-label">Primary Movement</span>
+          <span class="split-meta-val">${escapeHtml(split.primaryExercise)}</span>
+        </div>
+      </div>
+
+      <!-- Target Anatomy Pills -->
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+        ${(split.targetMuscles || []).map(m => `
+          <span style="font-size: 0.73rem; background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); padding: 3px 8px; border-radius: var(--radius-full); color: var(--text-secondary);">
+            📍 ${escapeHtml(m)}
+          </span>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- Column 2: User Action Photo & Exercise Protocol -->
+    <div class="split-exercise-side">
+      <div>
+        <div class="split-exercise-hero">
+          <div class="split-exercise-img-wrap" id="btn-split-exercise-zoom" title="Click to view full-resolution exercise photo">
+            <img src="${split.exercisePhoto}" alt="${split.primaryExercise}" class="split-exercise-img">
+          </div>
+          <div class="split-exercise-info">
+            <h4>${split.isHoliday ? '🏖️ Active Recovery & Nutrition' : '🏋️ Form Cue & Execution'}</h4>
+            <p>
+              ${split.isHoliday 
+                ? 'Hydrate with minerals, perform full myofascial foam rolling, and fuel up with high-protein meals for the upcoming week.'
+                : `Key movement for ${split.day}: <strong>${escapeHtml(split.primaryExercise)}</strong>. Focus on full stretch at bottom and explosive mind-muscle contraction.`}
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-primary);">
+            ${split.isHoliday ? 'Sunday Restoration Protocol' : 'Structured Daily Routine'}
+          </h4>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">4 Stations</span>
+        </div>
+
+        <!-- Exercise Routine Items -->
+        <div class="exercise-routine-list">
+          ${split.exercises.map(ex => `
+            <div class="exercise-item">
+              <div class="exercise-name-block">
+                <strong>${escapeHtml(ex.name)}</strong>
+                <small>${escapeHtml(ex.note)}</small>
+              </div>
+              <span class="exercise-sets-badge" style="color: ${split.color}; border-color: ${split.color}55; background: ${split.color}15;">
+                ${escapeHtml(ex.sets)}
+              </span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="split-action-row">
+        ${split.isHoliday ? `
+          <span style="font-size: 0.85rem; color: var(--text-secondary);">
+            🏖️ Gym is closed on Sunday for holiday recovery.
+          </span>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-quick-filter-monday">
+            💥 Book Monday Chest
+          </button>
+        ` : `
+          <button type="button" class="btn btn-primary btn-sm" id="btn-quick-filter-split">
+            🔍 Filter ${split.day} Sessions
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-view-poster-modal">
+            🖼️ View Full Poster
+          </button>
+        `}
+      </div>
+    </div>
+  `;
+
+  // Attach zoom clicks
+  document.getElementById("btn-split-poster-zoom")?.addEventListener("click", () => {
+    openLightbox(
+      split.poster,
+      `${split.day} Poster: ${split.badge}`,
+      split.tagline,
+      split.badge,
+      `<strong>Target Anatomy:</strong> ${split.targetMuscles.join(", ")} | <strong>Intensity:</strong> ${split.intensity}`
+    );
+  });
+
+  document.getElementById("btn-view-poster-modal")?.addEventListener("click", () => {
+    openLightbox(
+      split.poster,
+      `${split.day} Poster: ${split.badge}`,
+      split.tagline,
+      split.badge,
+      `<strong>Target Anatomy:</strong> ${split.targetMuscles.join(", ")} | <strong>Intensity:</strong> ${split.intensity}`
+    );
+  });
+
+  document.getElementById("btn-split-exercise-zoom")?.addEventListener("click", () => {
+    openLightbox(
+      split.exercisePhoto,
+      `${split.day} Exercise: ${split.primaryExercise}`,
+      `Key Exercise for ${split.badge}`,
+      split.badge,
+      `
+      <div style="margin-top: 8px;">
+        <strong>Routine:</strong>
+        <ul style="padding-left: 20px; margin: 4px 0 0;">
+          ${split.exercises.map(e => `<li>${escapeHtml(e.name)} — <strong>${escapeHtml(e.sets)}</strong></li>`).join("")}
+        </ul>
+      </div>
+      `
+    );
+  });
+
+  document.getElementById("btn-quick-filter-split")?.addEventListener("click", () => {
+    state.selectedMuscle = split.muscle;
+    document.querySelectorAll(".muscle-pill-btn").forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-muscle") === split.muscle);
+    });
+    renderSessionsCards();
+    const grid = document.getElementById("sessions-container");
+    if (grid) {
+      grid.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+
+  document.getElementById("btn-quick-filter-monday")?.addEventListener("click", () => {
+    state.selectedMuscle = "Chest";
+    state.activeSplitDay = "Monday";
+    renderWeeklySplitSection("Monday");
+    document.querySelectorAll(".muscle-pill-btn").forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-muscle") === "Chest");
+    });
+    renderSessionsCards();
+  });
 }
 
 function setupSessionsFilterListeners() {
@@ -871,6 +1329,44 @@ function setupSessionsFilterListeners() {
   filterStatus.addEventListener("change", (e) => {
     state.filterStatus = e.target.value;
     renderSessionsCards();
+  });
+
+  // Quick Muscle Filter Pills
+  document.querySelectorAll(".muscle-pill-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".muscle-pill-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.selectedMuscle = btn.getAttribute("data-muscle") || "all";
+      if (typeof sounds !== "undefined") sounds.playClick();
+      renderSessionsCards();
+    });
+  });
+
+  // Sunday Notice Monday Button
+  document.getElementById("btn-view-monday-chest")?.addEventListener("click", () => {
+    const fd = document.getElementById("filter-date");
+    if (fd) fd.value = "";
+    state.selectedDate = null;
+    state.selectedMuscle = "Chest";
+    state.activeSplitDay = "Monday";
+    renderWeeklySplitSection("Monday");
+    document.querySelectorAll(".muscle-pill-btn").forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-muscle") === "Chest");
+    });
+    if (typeof sounds !== "undefined") sounds.playClick();
+    renderSessionsCards();
+  });
+
+  // Sunday Poster Click in Notice
+  document.getElementById("sunday-poster-click")?.addEventListener("click", () => {
+    const split = WEEKLY_SPLIT.Sunday;
+    openLightbox(
+      split.poster,
+      "Sunday Gym Holiday - Active Rest & Recovery",
+      "Recharge and refresh before Monday Chest Day",
+      "Gym Holiday",
+      `<p>PULSE Gym is dedicated to athletic longevity. Rest today, optimize nutrition and hydration, and return Monday at peak capacity.</p>`
+    );
   });
 
   btnToday.addEventListener("click", () => {
@@ -895,6 +1391,22 @@ function setupSessionsFilterListeners() {
 
   btnRetry.addEventListener("click", () => {
     fetchSessions();
+  });
+
+  // Setup Weekly Split Selector Days
+  document.querySelectorAll(".split-day-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const day = btn.getAttribute("data-day");
+      if (typeof sounds !== "undefined") sounds.playClick();
+      renderWeeklySplitSection(day);
+    });
+  });
+
+  // Lightbox Close Listeners
+  document.getElementById("lightbox-close")?.addEventListener("click", closeLightbox);
+  document.getElementById("btn-lightbox-done")?.addEventListener("click", closeLightbox);
+  document.getElementById("lightbox-modal")?.addEventListener("click", (e) => {
+    if (e.target.id === "lightbox-modal") closeLightbox();
   });
 }
 
@@ -1450,7 +1962,28 @@ function setupAdminEventListeners() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dateInput = document.getElementById("new-session-date");
-  if (dateInput) dateInput.value = tomorrow.toISOString().split("T")[0];
+  if (dateInput) {
+    dateInput.value = tomorrow.toISOString().split("T")[0];
+    const updateTargetNotice = () => {
+      const val = dateInput.value;
+      const split = getSplitForDate(val);
+      let noticeEl = document.getElementById("admin-date-muscle-notice");
+      if (!noticeEl) {
+        noticeEl = document.createElement("div");
+        noticeEl.id = "admin-date-muscle-notice";
+        noticeEl.style.fontSize = "0.8rem";
+        noticeEl.style.marginTop = "6px";
+        dateInput.parentElement.appendChild(noticeEl);
+      }
+      if (split.isHoliday) {
+        noticeEl.innerHTML = `<span style="color: #38bdf8; font-weight: 700;">🏖️ Note: ${split.day} is a Gym Holiday (Rest & Recovery Day).</span>`;
+      } else {
+        noticeEl.innerHTML = `<span style="color: ${split.color}; font-weight: 700;">${split.icon} Scheduled: ${split.day} - ${split.badge} (${split.muscle})</span>`;
+      }
+    };
+    dateInput.addEventListener("change", updateTargetNotice);
+    updateTargetNotice();
+  }
 
   // 1. Check-In Submission
   formCheckin.addEventListener("submit", async (e) => {

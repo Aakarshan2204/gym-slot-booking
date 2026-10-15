@@ -28,6 +28,168 @@ PORT = int(os.environ.get("PORT", 8000))
 HOST = os.environ.get("HOST", "127.0.0.1")
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
+# ============================================================================
+# Weekly Muscle Split & Training Program Configuration
+# ============================================================================
+TRAINING_SPLIT = {
+    "Monday": {
+        "day": "Monday",
+        "muscle": "Chest",
+        "badge": "Chest Day",
+        "tagline": "Pectoral Hypertrophy & Upper Body Power",
+        "icon": "💥",
+        "color": "#00F076",
+        "poster": "/images/poster_chest.jpg",
+        "exercise_photo": "/images/exercise_chest.jpg",
+        "primary_exercise": "Flat Barbell Bench Press",
+        "exercises": [
+            {"name": "Flat Barbell Bench Press", "sets": "4 Sets x 8-10 Reps", "note": "Explosive press, controlled 3-second negative descent"},
+            {"name": "Incline Dumbbell Press", "sets": "3 Sets x 10-12 Reps", "note": "Target upper clavicular pectoral head at 30° incline"},
+            {"name": "Cable Standing Chest Flyes", "sets": "3 Sets x 12-15 Reps", "note": "Constant tension with full peak contraction at center"},
+            {"name": "Weighted Dips / Pushups", "sets": "3 Sets to Failure", "note": "Lean torso forward 15° to recruit lower pecs"}
+        ],
+        "target_muscles": ["Pectoralis Major", "Pectoralis Minor", "Anterior Deltoids", "Triceps Brachii"],
+        "intensity": "Very High (85-90% 1RM)",
+        "estimated_burn": "520 - 680 kcal",
+        "is_holiday": False
+    },
+    "Tuesday": {
+        "day": "Tuesday",
+        "muscle": "Back",
+        "badge": "Back Day",
+        "tagline": "V-Taper Lat Width, Trap Density & Spine Stability",
+        "icon": "🦅",
+        "color": "#38bdf8",
+        "poster": "/images/poster_back.jpg",
+        "exercise_photo": "/images/exercise_back.jpg",
+        "primary_exercise": "Bent-Over Barbell Rows",
+        "exercises": [
+            {"name": "Conventional Deadlifts", "sets": "4 Sets x 5-6 Reps", "note": "Full posterior chain drive with neutral spine lock"},
+            {"name": "Bent-Over Barbell Rows", "sets": "4 Sets x 8-10 Reps", "note": "Pull to lower sternum, flare elbows slightly"},
+            {"name": "Wide-Grip Lat Pulldowns", "sets": "3 Sets x 10-12 Reps", "note": "Drive elbows down and back for maximum lat stretch"},
+            {"name": "Seated Cable Rows", "sets": "3 Sets x 12-15 Reps", "note": "Squeeze rhomboids and middle traps for 2 seconds"}
+        ],
+        "target_muscles": ["Latissimus Dorsi", "Trapezius", "Rhomboids", "Erector Spinae"],
+        "intensity": "Extreme (90% 1RM)",
+        "estimated_burn": "580 - 750 kcal",
+        "is_holiday": False
+    },
+    "Wednesday": {
+        "day": "Wednesday",
+        "muscle": "Biceps and Triceps",
+        "badge": "Biceps & Triceps",
+        "tagline": "Arm Hypertrophy & Antagonist Super-Sets",
+        "icon": "💪",
+        "color": "#c084fc",
+        "poster": "/images/poster_arms.jpg",
+        "exercise_photo": "/images/exercise_arms.jpg",
+        "primary_exercise": "Standing Dumbbell Bicep Curls",
+        "exercises": [
+            {"name": "Standing Dumbbell Bicep Curls", "sets": "4 Sets x 10-12 Reps", "note": "Strict supination at top of movement with zero body swing"},
+            {"name": "Cable Tricep Rope Pushdowns", "sets": "4 Sets x 12-15 Reps", "note": "Spread ropes at bottom to lock out tricep lateral head"},
+            {"name": "Incline Dumbbell Hammer Curls", "sets": "3 Sets x 10-12 Reps", "note": "Build brachialis and forearm thickness"},
+            {"name": "EZ-Bar Skull Crushers", "sets": "3 Sets x 10-12 Reps", "note": "Lower behind head to emphasize triceps long head"}
+        ],
+        "target_muscles": ["Biceps Brachii", "Triceps Brachii", "Brachialis", "Forearm Flexors"],
+        "intensity": "High (Hypertrophy / High Volume)",
+        "estimated_burn": "450 - 580 kcal",
+        "is_holiday": False
+    },
+    "Thursday": {
+        "day": "Thursday",
+        "muscle": "Shoulders",
+        "badge": "Shoulders Day",
+        "tagline": "3D Deltoid Caps & Overhead Power",
+        "icon": "🛡️",
+        "color": "#fbbf24",
+        "poster": "/images/poster_shoulders.jpg",
+        "exercise_photo": "/images/exercise_shoulders.jpg",
+        "primary_exercise": "Seated Dumbbell Shoulder Press",
+        "exercises": [
+            {"name": "Seated Overhead Dumbbell Press", "sets": "4 Sets x 8-10 Reps", "note": "Full range of motion, press slightly inward at lockout"},
+            {"name": "Dumbbell Lateral Raises", "sets": "4 Sets x 12-15 Reps", "note": "Lead with elbows for targeted lateral delt isolation"},
+            {"name": "Rear Delt Face Pulls", "sets": "3 Sets x 15 Reps", "note": "External rotation at finish for healthy rotator cuffs"},
+            {"name": "Barbell Shrugs", "sets": "3 Sets x 12 Reps", "note": "Controlled vertical contraction of upper trapezius"}
+        ],
+        "target_muscles": ["Anterior Deltoids", "Lateral Deltoids", "Posterior Deltoids", "Rotator Cuffs"],
+        "intensity": "High (Strength & Shape)",
+        "estimated_burn": "480 - 620 kcal",
+        "is_holiday": False
+    },
+    "Friday": {
+        "day": "Friday",
+        "muscle": "Cardio",
+        "badge": "Cardio & HIIT",
+        "tagline": "Cardiovascular Endurance, V02 Max & Fat Oxidation",
+        "icon": "⚡",
+        "color": "#f43f5e",
+        "poster": "/images/poster_cardio.jpg",
+        "exercise_photo": "/images/exercise_cardio.jpg",
+        "primary_exercise": "Curved Treadmill Interval Sprints",
+        "exercises": [
+            {"name": "Woodway Curved Treadmill Sprints", "sets": "8 Rounds x 30s Sprint / 30s Rest", "note": "Maximum anaerobic wattage and posterior propulsion"},
+            {"name": "Assault Fan Bike Tabata", "sets": "6 Rounds x 20s Max / 10s Low", "note": "Total body metabolic output and oxygen depletion"},
+            {"name": "Concept2 Rowing Ergometer", "sets": "5 x 500m Intervals", "note": "Keep stroke rate at 28-30 spm with powerful hip drive"},
+            {"name": "High-Speed Battle Ropes & Box Jumps", "sets": "4 Sets x 45s", "note": "Core stability, agility and explosive fast-twitch endurance"}
+        ],
+        "target_muscles": ["Heart & Lungs (VO2 Max)", "Calves & Hamstrings", "Core & Diaphragm"],
+        "intensity": "Maximum (Heart Rate Zone 4 - 5)",
+        "estimated_burn": "650 - 900 kcal",
+        "is_holiday": False
+    },
+    "Saturday": {
+        "day": "Saturday",
+        "muscle": "Legs",
+        "badge": "Legs Day",
+        "tagline": "Quad Sweeps, Hamstring Power & Glute Strength",
+        "icon": "🦵",
+        "color": "#a3e635",
+        "poster": "/images/poster_legs.jpg",
+        "exercise_photo": "/images/exercise_legs.jpg",
+        "primary_exercise": "Heavy Barbell Back Squats",
+        "exercises": [
+            {"name": "Barbell Back Squats", "sets": "5 Sets x 6-8 Reps", "note": "Deep hip crease below parallel, drive through whole foot"},
+            {"name": "Romanian Deadlifts (RDLs)", "sets": "4 Sets x 8-10 Reps", "note": "Hinge at hips for deep hamstring stretch and glute recruitment"},
+            {"name": "Leg Press Machine", "sets": "4 Sets x 10-12 Reps", "note": "High foot placement for glutes or close stance for quad sweep"},
+            {"name": "Standing Calf Raises", "sets": "4 Sets x 15-20 Reps", "note": "Full 2-second stretch at bottom and 1-second peak flex"}
+        ],
+        "target_muscles": ["Quadriceps", "Hamstrings", "Gluteus Maximus", "Gastrocnemius"],
+        "intensity": "Brutal (Heavy Compound Lifting)",
+        "estimated_burn": "650 - 850 kcal",
+        "is_holiday": False
+    },
+    "Sunday": {
+        "day": "Sunday",
+        "muscle": "Holiday / Rest Day",
+        "badge": "Gym Holiday - Rest & Recovery",
+        "tagline": "Active Recovery, Central Nervous System Reset & Nutrition",
+        "icon": "🧘",
+        "color": "#38bdf8",
+        "poster": "/images/poster_sunday_rest.jpg",
+        "exercise_photo": "/images/exercise_sunday_rest.jpg",
+        "primary_exercise": "Foam Rolling, Mobility & Hydration",
+        "exercises": [
+            {"name": "Full Body Myofascial Foam Rolling", "sets": "15-20 Minutes", "note": "Target tight IT bands, lats, thoracic spine and calves"},
+            {"name": "Dynamic Mobility & Hip Openers", "sets": "10-15 Minutes", "note": "Improve joint lubrication and prepare body for Monday"},
+            {"name": "Gentle 30-min Outdoor Walk", "sets": "Zone 1 Aerobic", "note": "Flush metabolic waste without inducing fatigue"},
+            {"name": "Electrolyte Hydration & High-Protein Meal Prep", "sets": "All Day", "note": "Replenish muscle glycogen and repair microtears"}
+        ],
+        "target_muscles": ["Central Nervous System (CNS)", "Connective Tissue", "Mind & Spirit"],
+        "intensity": "Restorative (Active Recovery & Rest)",
+        "estimated_burn": "Maintenance Baseline",
+        "is_holiday": True
+    }
+}
+
+def get_muscle_target_for_date(date_str: str) -> Dict[str, Any]:
+    """Resolves date string (YYYY-MM-DD) to its specific muscle group, posters, and exercises."""
+    try:
+        dt = datetime.date.fromisoformat(date_str)
+        day_name = dt.strftime("%A")
+        return TRAINING_SPLIT.get(day_name, TRAINING_SPLIT["Monday"])
+    except Exception:
+        return TRAINING_SPLIT["Monday"]
+
 class APIError(Exception):
     """Custom API exception for structured error responses."""
     def __init__(self, status: int, error: str, message: str, code: str = "ERROR", details: Any = None):
@@ -297,6 +459,14 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             self.send_json(stats)
             return
 
+        # Weekly training split & daily muscle targets
+        if path == "/api/training-split":
+            self.send_json({
+                "split": TRAINING_SPLIT,
+                "order": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            })
+            return
+
         raise APIError(404, "Not Found", f"Route {path} not found.", "ROUTE_NOT_FOUND")
 
     def handle_api_post(self, path: str, query: Dict[str, list]):
@@ -552,6 +722,9 @@ class GymRequestHandler(BaseHTTPRequestHandler):
                     item["user_waitlist_position"] = cursor.fetchone()[0]
                 else:
                     item["user_waitlist_position"] = None
+
+                # Attach specific daily muscle target and workout media
+                item["muscle_target"] = get_muscle_target_for_date(item["date"])
 
                 result.append(item)
             return result
@@ -935,6 +1108,7 @@ class GymRequestHandler(BaseHTTPRequestHandler):
                 item["has_ended"] = now_iso >= et
                 item["is_check_in_open"] = (st <= now_iso <= et) and (item["status"] == "confirmed") and (item["checked_in_at"] is None)
                 item["can_cancel"] = (now_iso < st) and (item["status"] == "confirmed")
+                item["muscle_target"] = get_muscle_target_for_date(item["date"])
                 bookings.append(item)
 
             # Waitlist entries
@@ -959,6 +1133,7 @@ class GymRequestHandler(BaseHTTPRequestHandler):
                 """, (item["session_id"], item["id"]))
                 item["position"] = cursor.fetchone()[0]
                 item["has_started"] = now_iso >= item["start_time"]
+                item["muscle_target"] = get_muscle_target_for_date(item["date"])
                 waitlist.append(item)
 
             return {
@@ -982,6 +1157,7 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             session["has_started"] = now_iso >= session["start_time"]
             session["has_ended"] = now_iso >= session["end_time"]
             session["is_check_in_open"] = session["start_time"] <= now_iso <= session["end_time"]
+            session["muscle_target"] = get_muscle_target_for_date(session["date"])
 
             # Bookings roster
             cursor.execute("""
@@ -1058,29 +1234,64 @@ class GymRequestHandler(BaseHTTPRequestHandler):
                 "utilization_rate": round(utilization_rate, 1)
             }
 
-def ensure_current_sessions():
-    """Ensures there are always active sessions for today and upcoming dates."""
-    today_str = datetime.date.today().isoformat()
+_last_session_refresh_check = 0.0
+
+def ensure_current_sessions(force: bool = False):
+    """
+    Ensures active and upcoming sessions always exist for the current hour,
+    today, tomorrow, and the upcoming week.
+    Throttled to avoid DB query overhead on high-frequency live polling.
+    """
+    global _last_session_refresh_check
+    import time
+    now_ts = time.time()
+    if not force and (now_ts - _last_session_refresh_check < 30.0):
+        return
+    _last_session_refresh_check = now_ts
+
+    now = datetime.datetime.now()
+    today_str = now.date().isoformat()
+    tomorrow_str = (now.date() + datetime.timedelta(days=1)).isoformat()
+    now_hour = now.hour
+
     try:
         with get_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM sessions WHERE date >= ?", (today_str,))
-            count = cursor.fetchone()[0]
-            if count == 0:
-                print(f"[AUTO-SEED] No active sessions found on or after {today_str}. Seeding fresh session data...")
+            # 1. Does an active session exist for today at current hour?
+            cursor.execute("SELECT COUNT(*) FROM sessions WHERE date = ? AND start_hour = ?", (today_str, now_hour))
+            has_current_hour = cursor.fetchone()[0] > 0
+
+            # 2. Does at least one session exist for tomorrow?
+            cursor.execute("SELECT COUNT(*) FROM sessions WHERE date = ?", (tomorrow_str,))
+            has_tomorrow = cursor.fetchone()[0] > 0
+
+            if not has_current_hour or not has_tomorrow:
+                print(f"[SCHEDULE SYNC] Refreshing sessions for {today_str} (hour {now_hour}) and upcoming days...")
                 from seed import seed_database
                 seed_database()
     except Exception as e:
-        print(f"[AUTO-SEED NOTICE] {repr(e)}")
+        print(f"[SCHEDULE SYNC NOTICE] {repr(e)}")
+
+def open_browser_when_ready():
+    import time
+    import webbrowser
+    time.sleep(0.4)
+    try:
+        webbrowser.open(f"http://localhost:{PORT}")
+    except Exception:
+        pass
 
 def run_server():
     init_db()
-    ensure_current_sessions()
+    ensure_current_sessions(force=True)
     server_address = (HOST, PORT)
     httpd = ThreadingHTTPServer(server_address, GymRequestHandler)
     print(f"============================================================")
     print(f" Gym Slot Booking Server Running on http://{HOST}:{PORT}")
     print(f"============================================================")
+    if os.environ.get("AUTO_OPEN_BROWSER", "1") == "1" and PORT == 8000:
+        import threading
+        threading.Thread(target=open_browser_when_ready, daemon=True).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

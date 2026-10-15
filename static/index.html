@@ -10,6 +10,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <script>
+    if (window.location.protocol === "file:") {
+      window.addEventListener("DOMContentLoaded", () => {
+        document.body.innerHTML = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #070b12; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;">
+            <div style="background: #0f172a; border: 1px solid #38bdf8; border-radius: 16px; max-width: 580px; padding: 36px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);">
+              <div style="font-size: 52px; margin-bottom: 16px;">⚡</div>
+              <h2 style="color: #38bdf8; font-size: 1.6rem; margin-bottom: 12px; font-weight: 800;">Start Local Server</h2>
+              <p style="color: #94a3b8; font-size: 1rem; line-height: 1.6; margin-bottom: 24px;">
+                You opened this HTML file directly from disk (<code>file:///</code>). Modern web APIs and QR security require running via the local server.
+              </p>
+              <div style="background: #020617; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; text-align: left; font-family: monospace; font-size: 0.9rem; color: #a5f3fc; margin-bottom: 24px; line-height: 1.8;">
+                <strong style="color: #fff;">To open the website:</strong><br>
+                1. Double-click <strong style="color: #38bdf8;">start.bat</strong> in the project folder<br>
+                &nbsp;&nbsp;&nbsp;<em>(or run <code>python server.py</code> in terminal)</em><br>
+                2. Your browser will automatically open to <strong style="color: #4ade80;">http://localhost:8000</strong>
+              </div>
+              <a href="http://localhost:8000" style="display: inline-block; background: linear-gradient(135deg, #0284c7, #2563eb); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem;">Go to http://localhost:8000</a>
+            </div>
+          </div>
+        `;
+      });
+    }
+  </script>
 </head>
 <body>
 
@@ -56,6 +80,9 @@
       <li id="nav-item-sessions">
         <a href="#sessions" class="nav-link" id="nav-sessions">Browse Sessions</a>
       </li>
+      <li id="nav-item-split">
+        <a href="#weekly-split-section" class="nav-link" id="nav-split">Weekly Split</a>
+      </li>
       <li id="nav-item-my-bookings" class="hidden">
         <a href="#my-bookings" class="nav-link" id="nav-my-bookings">My Bookings</a>
       </li>
@@ -71,6 +98,25 @@
 
   <!-- Global Notification / Toast Container -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- High-Res Exercise & Poster Lightbox Modal -->
+  <div class="modal-overlay" id="lightbox-modal" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+    <div class="modal-content lightbox-modal-content">
+      <button type="button" class="modal-close" id="lightbox-close" aria-label="Close lightbox">&times;</button>
+      <div class="lightbox-header">
+        <span class="badge" id="lightbox-badge">Chest Day</span>
+        <h3 id="lightbox-title" style="margin: 6px 0 2px; font-size: 1.35rem;">Full Resolution Visual</h3>
+        <p id="lightbox-caption" style="color: var(--text-secondary); font-size: 0.85rem; margin: 0;"></p>
+      </div>
+      <div class="lightbox-media-wrapper">
+        <img id="lightbox-img" src="" alt="Workout Poster or Exercise" class="lightbox-img">
+      </div>
+      <div class="lightbox-footer">
+        <div id="lightbox-details" style="font-size: 0.88rem; color: var(--text-secondary);"></div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-lightbox-done">Close Preview</button>
+      </div>
+    </div>
+  </div>
 
   <!-- VIP QR Code Modal (Real ISO/IEC 18004 Standard QR Code) -->
   <div class="modal-overlay" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
@@ -239,23 +285,104 @@
         </div>
       </div>
 
+      <!-- ==========================================
+           WEEKLY MUSCLE TARGET & WORKOUT PROGRAM SHOWCASE
+           ========================================== -->
+      <section class="split-showcase-container" id="weekly-split-section" aria-label="Weekly Muscle Training Program">
+        <div class="split-section-header">
+          <div>
+            <div class="split-tag">
+              <span class="pulse-dot"></span>
+              <span>DAILY MUSCLE TARGET PROGRAM</span>
+            </div>
+            <h2 class="split-section-title">Weekly Training Split & Muscle Focus</h2>
+            <p class="split-section-subtitle">
+              Every day targets an anatomical muscle group with specialized equipment routines, pro form coaching, and certified recovery days.
+            </p>
+          </div>
+          <div class="split-today-indicator" id="split-today-badge">
+            <span class="pulse-dot"></span>
+            <span id="split-today-text">Today's Focus</span>
+          </div>
+        </div>
+
+        <!-- 7-Day Interactive Selector Bar -->
+        <div class="split-day-nav" role="tablist" id="split-day-nav-bar">
+          <button type="button" class="split-day-btn" data-day="Monday" role="tab" aria-selected="false">
+            <span class="sdb-icon">💥</span>
+            <span class="sdb-day">Mon</span>
+            <span class="sdb-target">Chest</span>
+          </button>
+          <button type="button" class="split-day-btn" data-day="Tuesday" role="tab" aria-selected="false">
+            <span class="sdb-icon">🦅</span>
+            <span class="sdb-day">Tue</span>
+            <span class="sdb-target">Back</span>
+          </button>
+          <button type="button" class="split-day-btn" data-day="Wednesday" role="tab" aria-selected="false">
+            <span class="sdb-icon">💪</span>
+            <span class="sdb-day">Wed</span>
+            <span class="sdb-target">Arms</span>
+          </button>
+          <button type="button" class="split-day-btn" data-day="Thursday" role="tab" aria-selected="false">
+            <span class="sdb-icon">🛡️</span>
+            <span class="sdb-day">Thu</span>
+            <span class="sdb-target">Shoulders</span>
+          </button>
+          <button type="button" class="split-day-btn" data-day="Friday" role="tab" aria-selected="false">
+            <span class="sdb-icon">⚡</span>
+            <span class="sdb-day">Fri</span>
+            <span class="sdb-target">Cardio</span>
+          </button>
+          <button type="button" class="split-day-btn" data-day="Saturday" role="tab" aria-selected="false">
+            <span class="sdb-icon">🦵</span>
+            <span class="sdb-day">Sat</span>
+            <span class="sdb-target">Legs</span>
+          </button>
+          <button type="button" class="split-day-btn holiday" data-day="Sunday" role="tab" aria-selected="false">
+            <span class="sdb-icon">🧘</span>
+            <span class="sdb-day">Sun</span>
+            <span class="sdb-target">Holiday</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Split Detail Card with Poster and Exercise Breakdown -->
+        <div class="split-detail-card" id="split-detail-container">
+          <!-- Injected via JavaScript renderSplitDetail() -->
+        </div>
+      </section>
+
       <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-group">
           <label for="filter-date" class="filter-label">Date:</label>
-          <input type="date" id="filter-date" class="form-input" style="width: auto; min-width: 160px;">
+          <input type="date" id="filter-date" class="form-input" style="width: auto; min-width: 150px;">
           <button type="button" class="btn btn-secondary btn-sm" id="btn-today">Today</button>
           <button type="button" class="btn btn-secondary btn-sm" id="btn-tomorrow">Tomorrow</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-date">Show All Dates</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-date">All Dates</button>
         </div>
 
         <div class="filter-group">
-          <label for="filter-status" class="filter-label">Filter:</label>
-          <select id="filter-status" class="form-select" style="width: auto; min-width: 150px;">
+          <label for="filter-status" class="filter-label">Status:</label>
+          <select id="filter-status" class="form-select" style="width: auto; min-width: 130px;">
             <option value="all">All Sessions</option>
             <option value="available">Available Spots</option>
             <option value="full">Full (Waitlist Open)</option>
           </select>
+        </div>
+
+        <!-- Muscle Target Filter Group -->
+        <div class="filter-group filter-muscle-group">
+          <span class="filter-label">Target:</span>
+          <div class="muscle-quick-pills" id="muscle-filter-pills">
+            <button type="button" class="muscle-pill-btn active" data-muscle="all">All Muscles</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Chest">💥 Chest (Mon)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Back">🦅 Back (Tue)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Biceps and Triceps">💪 Arms (Wed)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Shoulders">🛡️ Shoulders (Thu)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Cardio">⚡ Cardio (Fri)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Legs">🦵 Legs (Sat)</button>
+            <button type="button" class="muscle-pill-btn holiday" data-muscle="Holiday">🏖️ Holiday (Sun)</button>
+          </div>
         </div>
       </div>
 
@@ -271,10 +398,57 @@
         <button type="button" class="btn btn-secondary btn-sm" id="btn-retry-sessions">Retry</button>
       </div>
 
+      <!-- Sunday Holiday Rest Announcement Box -->
+      <div id="sunday-holiday-notice" class="sunday-holiday-card" style="display: none;">
+        <div class="sunday-holiday-inner">
+          <div class="sunday-holiday-media">
+            <img src="/images/poster_sunday_rest.jpg" alt="Sunday Gym Holiday" class="sunday-holiday-img" id="sunday-poster-click">
+            <div class="sunday-media-badge">🧘 SUNDAY REST & RECOVERY</div>
+          </div>
+          <div class="sunday-holiday-content">
+            <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); width: fit-content;">
+              🏖️ Official Gym Holiday
+            </span>
+            <h3 style="font-size: 1.5rem; font-weight: 800; margin: 8px 0 6px;">Facility Closed for Deep Recovery</h3>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 16px;">
+              PULSE Gym observes a weekly rest holiday every Sunday to prioritize central nervous system restoration, joint longevity, and facility deep sanitization. Regular training sessions resume Monday with <strong>Chest Day</strong>!
+            </p>
+            <div class="sunday-recovery-tips">
+              <div class="tip-item">
+                <span class="tip-icon">💧</span>
+                <div>
+                  <strong>Electrolyte Hydration</strong>
+                  <small>Drink 3-4 liters with mineral salts</small>
+                </div>
+              </div>
+              <div class="tip-item">
+                <span class="tip-icon">🧘‍♂️</span>
+                <div>
+                  <strong>Foam Rolling & Mobility</strong>
+                  <small>20 mins myofascial release</small>
+                </div>
+              </div>
+              <div class="tip-item">
+                <span class="tip-icon">🥗</span>
+                <div>
+                  <strong>Nutrient Replenishment</strong>
+                  <small>High protein meal prep for Monday</small>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 18px;">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-view-monday-chest">
+                💥 View Monday Chest Sessions
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Empty State -->
       <div id="sessions-empty" class="empty-state" style="display: none;">
         <h3>No sessions found</h3>
-        <p>There are no sessions scheduled for this date. Check another date or ask staff to create one.</p>
+        <p>There are no sessions scheduled for this filter. Check another date or ask staff to create one.</p>
       </div>
 
       <!-- Sessions Grid -->
