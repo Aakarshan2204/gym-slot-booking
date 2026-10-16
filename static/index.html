@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE GYM - Online Session Booking & Check-in System</title>
-  <meta name="description" content="Seamless 1-hour gym session booking system with instant seat confirmation, automated FIFO waitlist promotion, and cryptographically secure door check-in.">
+  <meta name="description" content="Pulse Gym - Premium fitness facility offering small-group 1-hour training blocks, certified floor coaches, digital entry passes, and modern equipment in an uncrowded atmosphere.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
     if (window.location.protocol === "file:") {
       window.addEventListener("DOMContentLoaded", () => {
         document.body.innerHTML = `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #070b12; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;">
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif; background: #070b12; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;">
             <div style="background: #0f172a; border: 1px solid #38bdf8; border-radius: 16px; max-width: 580px; padding: 36px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);">
               <div style="font-size: 52px; margin-bottom: 16px;">⚡</div>
               <h2 style="color: #38bdf8; font-size: 1.6rem; margin-bottom: 12px; font-weight: 800;">Start Local Server</h2>
@@ -37,23 +37,23 @@
 </head>
 <body>
 
-  <!-- Community Demo Persona Switcher Bar (Zero-Sound, Privacy-Enforced) -->
-  <header class="demo-bar" id="demo-bar" aria-label="Community Demo Profiles">
+  <!-- Quick Sign-In Bar -->
+  <header class="demo-bar" id="demo-bar" aria-label="Quick Account Switcher">
     <div class="demo-bar-title">
-      <span>👥 Community Preview:</span>
+      <span>🔑 Quick Sign-In:</span>
     </div>
     <div class="demo-personas" id="demo-personas-container">
-      <button type="button" class="demo-chip admin" data-email="admin@gympulse.com" data-pass="AdminPass123!">
-        🛡️ Front Desk Staff
+      <button type="button" class="demo-chip admin" data-email="admin@gympulse.com" data-pass="AdminPass123!" title="Staff Access">
+        🛡️ Staff Desk
       </button>
-      <button type="button" class="demo-chip" data-email="sarah@gympulse.com" data-pass="MemberPass123!">
-        👤 Sarah (Active Member)
+      <button type="button" class="demo-chip" data-email="sarah@gympulse.com" data-pass="MemberPass123!" title="Member Account">
+        👤 Sarah Connor
       </button>
-      <button type="button" class="demo-chip" data-email="mike@gympulse.com" data-pass="MemberPass123!">
-        ⏳ Mike (Standby Queue)
+      <button type="button" class="demo-chip" data-email="mike@gympulse.com" data-pass="MemberPass123!" title="Member Account">
+        👤 Mike Miller
       </button>
-      <button type="button" class="demo-chip" data-email="alex@gympulse.com" data-pass="MemberPass123!">
-        ✨ Alex (New Member)
+      <button type="button" class="demo-chip" data-email="alex@gympulse.com" data-pass="MemberPass123!" title="Member Account">
+        👤 Alex Mercer
       </button>
     </div>
   </header>
@@ -110,33 +110,27 @@
     </div>
   </div>
 
-  <!-- VIP QR Code Modal (Real ISO/IEC 18004 Standard QR Code) -->
+  <!-- Digital Entry Pass Modal -->
   <div class="modal-overlay" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
     <div class="modal-content vip-ticket-modal">
       <button type="button" class="modal-close" id="qr-modal-close" aria-label="Close modal">&times;</button>
-      <div class="vip-ticket-badge">⚡ YOUR DIGITAL GYM PASS</div>
-      <h3 id="qr-modal-title" class="vip-modal-title">Door Check-In Pass</h3>
+      <div class="vip-ticket-badge">⚡ DIGITAL ENTRY PASS</div>
+      <h3 id="qr-modal-title" class="vip-modal-title">Member Check-In Pass</h3>
       <p id="qr-modal-subtitle" class="vip-modal-subtitle">
-        Show this pass or QR code at the front desk when you arrive for your workout:
+        Present this QR code or 6-character code at the front desk when arriving for your session:
       </p>
       
-      <!-- Optical Viewfinder with Targeting Crosshairs & Animated Laser Scan Line -->
-      <div class="qr-scanner-viewfinder">
-        <div class="vf-corner tl"></div>
-        <div class="vf-corner tr"></div>
-        <div class="vf-corner bl"></div>
-        <div class="vf-corner br"></div>
-        <div class="vf-laser-line"></div>
+      <div class="qr-pass-badge">
         <div id="qr-svg-wrapper" class="qr-code-display"></div>
       </div>
 
       <div class="ticket-code-showcase">
-        <span class="ticket-code-label">Your Personal Check-In Code</span>
+        <span class="ticket-code-label">Access Code</span>
         <div class="ticket-code-large" id="qr-modal-code">------</div>
       </div>
 
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 12px; font-style: italic; text-align: center;">
-        “Have an amazing workout today! Floor coaches are always available if you need a spot or form check.”
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin: 6px 0 14px; font-style: italic; text-align: center;">
+        “Have a great workout! Our floor coaches are available if you need a spot or form check.”
       </p>
 
       <div class="modal-action-buttons">
@@ -144,7 +138,7 @@
           📋 Copy Code
         </button>
         <button type="button" class="btn btn-secondary btn-sm" id="btn-download-qr-ticket">
-          💾 Save Pass Card
+          💾 Save Pass
         </button>
         <button type="button" class="btn btn-primary btn-sm" id="btn-test-checkin-modal" style="display: none;">
           🛡️ Staff Check-In Desk
@@ -153,7 +147,7 @@
     </div>
   </div>
 
-  <!-- Member Profile Modal (Private & Strictly Isolated) -->
+  <!-- Member Profile Modal -->
   <div class="modal-overlay" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
     <div class="modal-content profile-modal-content">
       <button type="button" class="modal-close" id="profile-modal-close" aria-label="Close profile modal">&times;</button>
@@ -163,7 +157,7 @@
         <div class="profile-title-block">
           <div class="profile-badge-row">
             <span class="user-role" id="profile-role-badge">Member</span>
-            <span class="privacy-status-pill">🔒 Private Profile</span>
+            <span class="privacy-status-pill">Member Account</span>
           </div>
           <h3 id="profile-modal-title" class="profile-name">Member Profile</h3>
           <p class="profile-email" id="profile-modal-email">member@gympulse.com</p>
@@ -173,8 +167,8 @@
       <div class="profile-privacy-banner">
         <span class="privacy-icon">🛡️</span>
         <div>
-          <strong>Strict Profile Privacy & Account Isolation</strong>
-          <p>Your bookings, door check-in access codes, and profile information are strictly private. Other gym members cannot see or modify your account.</p>
+          <strong>Account Privacy & Security</strong>
+          <p>Your session bookings, door access codes, and profile information are private to your account.</p>
         </div>
       </div>
 
@@ -192,14 +186,14 @@
           <span class="pd-val highlight" id="profile-bookings-count">0</span>
         </div>
         <div class="profile-detail-card">
-          <span class="pd-label">Waitlist Position</span>
+          <span class="pd-label">Standby Position</span>
           <span class="pd-val" id="profile-waitlist-count">None</span>
         </div>
       </div>
 
       <div class="profile-actions">
-        <a href="#my-bookings" class="btn btn-primary btn-sm" id="btn-profile-view-tickets">🎟️ View My Tickets</a>
-        <button type="button" class="btn btn-secondary btn-sm" id="btn-profile-logout">Log Out</button>
+        <a href="#my-bookings" class="btn btn-primary btn-sm" id="btn-profile-view-tickets">🎟️ View My Passes</a>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-profile-logout">Sign Out</button>
       </div>
     </div>
   </div>
@@ -215,7 +209,7 @@
         <div style="text-align: center; margin-bottom: 24px;">
           <h1 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;">Welcome to PULSE GYM</h1>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
-            Book 1-hour sessions, track waitlists & access door check-in.
+            Reserve small-group sessions, access digital door passes, and train with certified coaches.
           </p>
         </div>
 
@@ -288,49 +282,49 @@
         </div>
       </div>
 
-      <!-- Humanized Community Greeting & Daily Coach Tip Banner -->
+      <!-- Member Greeting & Daily Coach Tip Banner -->
       <div id="human-greeting-banner" class="human-greeting-card">
         <!-- Injected via JavaScript renderHumanGreeting() -->
       </div>
 
-      <!-- High-Impact Athletic Hero Banner -->
+      <!-- Hero Showcase -->
       <div class="hero-showcase">
         <div class="hero-content">
           <div class="hero-tag">
             <span class="pulse-dot"></span>
-            <span>🤝 THE GYM WHERE EVERY ATHLETE HAS ROOM TO GROW</span>
+            <span>PREMIUM FITNESS & SMALL-GROUP TRAINING</span>
           </div>
           <h1 class="hero-title">Train In Peace. <span class="gradient-text">Never Overcrowded.</span></h1>
           <p class="hero-subtitle">
-            Say goodbye to fighting for squat racks or waiting for dumbbells. We cap every 1-hour session to 20 athletes so you can focus on proper form, make steady progress, and train alongside a supportive, motivating community.
+            Say goodbye to waiting for squat racks and crowded weight rooms. Every 1-hour session is limited to 20 athletes so you can focus on form, make real progress, and train alongside a supportive fitness community.
           </p>
           <div class="hero-stats-row">
             <div class="hero-stat-pill">
               <span class="stat-pill-icon">🏋️‍♂️</span>
               <div>
-                <strong>Spacious 20-Cap</strong>
-                <small>Always an open bench & rack</small>
+                <strong>20-Athlete Limit</strong>
+                <small>Guaranteed bench & rack space</small>
               </div>
             </div>
             <div class="hero-stat-pill">
               <span class="stat-pill-icon">🤝</span>
               <div>
-                <strong>Floor Coach Support</strong>
-                <small>Form checks & encouragement</small>
+                <strong>Floor Coaching</strong>
+                <small>Certified coaches on duty</small>
               </div>
             </div>
             <div class="hero-stat-pill">
               <span class="stat-pill-icon">⏳</span>
               <div>
-                <strong>Fair Standby Queue</strong>
-                <small>Life happens—we hold your spot</small>
+                <strong>Standby Priority</strong>
+                <small>Auto spots when plans change</small>
               </div>
             </div>
             <div class="hero-stat-pill">
               <span class="stat-pill-icon">📱</span>
               <div>
-                <strong>One-Tap Phone Pass</strong>
-                <small>Contactless front-desk check-in</small>
+                <strong>Digital Entry Pass</strong>
+                <small>Quick contactless desk check-in</small>
               </div>
             </div>
           </div>
@@ -414,7 +408,7 @@
           </div>
           <h2 class="split-section-title">Certified Coaches On The Floor Every Hour</h2>
           <p class="split-section-subtitle">
-            No intimidation, no robotic machines. Our coaches are right there on the floor to check your form, share a spot, and help you train injury-free.
+            Train with confidence in an encouraging space. Our coaches are right there on the floor to guide your form, share a spot, and celebrate your progress.
           </p>
         </div>
         <div class="coaches-grid">
@@ -628,26 +622,26 @@
           <span class="stat-sub" id="stat-attendance-rate">0% attendance rate</span>
         </div>
         <div class="stat-card">
-          <span class="stat-label">Waitlist Queue</span>
+          <span class="stat-label">Standby Members</span>
           <span class="stat-value" id="stat-waitlist">-</span>
-          <span class="stat-sub">Waiting for promotion</span>
+          <span class="stat-sub">Waiting for openings</span>
         </div>
       </div>
 
-      <!-- Action 1: Door Check-In Redemption Box -->
+      <!-- Front Desk Member Check-In -->
       <div class="checkin-box">
         <h2 style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-          <span>🚪 Reception Desk Check-in</span>
+          <span>🚪 Front Desk Check-in</span>
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
-          Type the member's 6-character short code. Works once only, strictly during the session's 1-hour window.
+          Enter the member's 6-character access code from their digital pass to verify entry.
         </p>
 
         <form id="admin-checkin-form" novalidate>
           <div class="checkin-input-group">
             <input type="text" id="admin-checkin-code" class="form-input checkin-code-input" placeholder="e.g. 7XKP2Q" maxlength="10" required autocomplete="off">
             <button type="submit" class="btn btn-primary" id="btn-checkin-submit">
-              <span>Mark Present</span>
+              <span>Verify & Check In</span>
             </button>
           </div>
           <div class="form-error" id="admin-checkin-error">Please enter a valid code.</div>
@@ -665,11 +659,11 @@
         </div>
       </div>
 
-      <!-- Action 2: Create Session Form -->
+      <!-- Schedule Training Session -->
       <div class="checkin-box" style="margin-bottom: 28px;">
-        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Create New Gym Session</h2>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Schedule Training Session</h2>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">
-          Sessions start on the hour and last 1 hour with a capacity of 20. Two sessions cannot share a start time.
+          Sessions start on the hour and last 1 hour with a capacity of 20 athletes.
         </p>
 
         <form id="admin-create-session-form" novalidate style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end;">
@@ -703,23 +697,23 @@
 
           <div class="form-group" style="margin-bottom: 0;">
             <label class="form-label" for="new-session-capacity">Capacity</label>
-            <input type="number" id="new-session-capacity" class="form-input" value="20" min="1" max="100" readonly title="Default capacity is 20 per challenge specifications">
+            <input type="number" id="new-session-capacity" class="form-input" value="20" min="1" max="100" readonly title="Facility capacity is 20 athletes per block">
           </div>
 
           <div>
             <button type="submit" class="btn btn-primary" id="btn-create-session-submit" style="width: 100%;">
-              <span>+ Create Session</span>
+              <span>+ Schedule Session</span>
             </button>
           </div>
         </form>
       </div>
 
-      <!-- Action 3: Session Roster Inspector -->
+      <!-- Session Attendee Roster -->
       <div class="checkin-box">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
           <div>
-            <h2 style="font-size: 1.25rem; font-weight: 700;">Session Attendee Roster</h2>
-            <p style="color: var(--text-secondary); font-size: 0.88rem;">Select any session to view its confirmed attendees and live waitlist.</p>
+            <h2 style="font-size: 1.25rem; font-weight: 700;">Session Attendance Roster</h2>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Select any session to view confirmed athletes and standby members.</p>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <label for="admin-roster-session-select" class="filter-label">Session:</label>
@@ -740,8 +734,39 @@
 
   </main>
 
-  <footer style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-subtle); margin-top: auto;">
-    <p>PULSE GYM &copy; 2026. Built with Python 3.13, SQLite (ACID Immediate Transactions), and Modern Vanilla ES6.</p>
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <a href="#sessions" class="nav-brand">
+            <span>PULSE</span>
+            <span class="brand-badge">GYM</span>
+          </a>
+        </div>
+        <p class="footer-desc">
+          Premium strength & conditioning facility. Small-group sessions, certified floor coaches, and spacious uncrowded training.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Facility Hours</h4>
+        <p class="footer-text">
+          Monday – Saturday: 6:00 AM – 11:00 PM<br>
+          Sunday: 11:00 AM Active Recovery Workshop
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Front Desk & Location</h4>
+        <p class="footer-text">
+          540 Fitness Boulevard, Suite 100<br>
+          Front Desk: (555) 019-4820<br>
+          hello@gympulse.com
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Pulse Gym, Inc. All rights reserved. &bull; <a href="#sessions">Privacy Policy</a> &bull; <a href="#sessions">Membership Terms</a> &bull; <a href="#sessions">Facility Rules</a></p>
+    </div>
   </footer>
 
   <script src="/js/qr-engine.js"></script>

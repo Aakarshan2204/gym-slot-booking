@@ -1,13 +1,11 @@
 /* ==========================================================================
-   PULSE GYM - Cyber-Athletic High-Performance Design System
-   Modern Glassmorphism, Dynamic Gradients, Ambient Glow, Micro-Animations,
-   ISO/IEC 18004 QR Scanner Viewfinder, WCAG AA Contrast, 360px Ready.
+   Pulse Gym - Member Portal & Session Booking Stylesheet
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
 
 :root {
-  /* Dynamic Cyber-Athletic Palette */
+  /* Color Palette */
   --bg-primary: #070b12;
   --bg-secondary: #0d131f;
   --bg-tertiary: #141c2c;
@@ -46,7 +44,7 @@
   --status-live-text: #00e5ff;
 
   /* Typography */
-  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
@@ -116,7 +114,7 @@ h1, h2, h3, h4, .page-title, .hero-title {
   outline-offset: 3px;
 }
 
-/* Top Demo Persona Bar */
+/* Quick Sign-In Bar */
 .demo-bar {
   background: linear-gradient(90deg, #101726 0%, #141c2c 100%);
   border-bottom: 1px solid var(--border-subtle);
@@ -184,7 +182,7 @@ h1, h2, h3, h4, .page-title, .hero-title {
 }
 
 /* ============================================================================
-   Humanized Community Greeting & Daily Coach Tip Banner
+   Member Greeting & Daily Coach Tip Banner
    ============================================================================ */
 .human-greeting-card {
   background: linear-gradient(135deg, rgba(20, 27, 45, 0.95), rgba(12, 17, 29, 0.95));
@@ -1357,16 +1355,16 @@ h1, h2, h3, h4, .page-title, .hero-title {
   line-height: 1.4;
 }
 
-/* Optical Scanner Viewfinder Frame */
-.qr-scanner-viewfinder {
+/* Digital Pass Badge Frame */
+.qr-scanner-viewfinder,
+.qr-pass-badge {
   position: relative;
   display: inline-block;
   padding: 16px;
   background: #ffffff;
-  border-radius: 14px;
-  margin: 8px auto 14px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 118, 0.2);
-  overflow: hidden;
+  border-radius: 16px;
+  margin: 10px auto 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .qr-code-display {
@@ -1377,39 +1375,6 @@ h1, h2, h3, h4, .page-title, .hero-title {
 
 .qr-code-display svg {
   display: block;
-}
-
-/* Viewfinder Target Brackets */
-.vf-corner {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border: 3px solid var(--accent-lime);
-  pointer-events: none;
-  z-index: 10;
-}
-.vf-corner.tl { top: 6px; left: 6px; border-right: none; border-bottom: none; }
-.vf-corner.tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
-.vf-corner.bl { bottom: 6px; left: 6px; border-right: none; border-top: none; }
-.vf-corner.br { bottom: 6px; right: 6px; border-left: none; border-top: none; }
-
-/* Animated Sweeping Laser Scan Line */
-.vf-laser-line {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #00f076, #00e5ff, transparent);
-  box-shadow: 0 0 10px #00f076;
-  pointer-events: none;
-  z-index: 8;
-  animation: laserSweep 2.2s ease-in-out infinite alternate;
-}
-
-@keyframes laserSweep {
-  0% { top: 6%; opacity: 0.3; }
-  50% { top: 92%; opacity: 1; }
-  100% { top: 6%; opacity: 0.3; }
 }
 
 .ticket-code-showcase {
@@ -2326,4 +2291,80 @@ h1, h2, h3, h4, .page-title, .hero-title {
 .user-badge:hover {
   transform: translateY(-1px);
   border-color: var(--accent-lime);
+}
+
+/* ============================================================================
+   Professional Gym Site Footer
+   ============================================================================ */
+.site-footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
+  padding: 48px 24px 24px;
+  margin-top: 64px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 36px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.footer-desc {
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 380px;
+  margin: 0;
+}
+
+.footer-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  letter-spacing: -0.2px;
+}
+
+.footer-text {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.footer-bottom a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-bottom a:hover {
+  color: var(--accent-lime);
 }

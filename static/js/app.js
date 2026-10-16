@@ -1,13 +1,6 @@
 /**
- * PULSE GYM - Frontend Single Page Application
- * Features:
- * - Client-side router with route guards
- * - Optimistic instant booking with automatic rollback
- * - Live polling for real-time seat counts (4s cadence)
- * - Live check-in countdown timer (1s interval)
- * - Standalone SVG QR code generator
- * - Web Audio API feedback synthesizer
- * - Inline form validation & accessible text error messages
+ * PULSE GYM - Member Portal & Session Scheduling
+ * Client application for reserving training blocks and digital check-in passes.
  */
 
 // ============================================================================
@@ -226,7 +219,7 @@ const state = {
 };
 
 // ============================================================================
-// Zero-Audio Quiet Mode (Sound option removed per user preference)
+// Audio Feedback Controller
 // ============================================================================
 const sounds = {
   playClick() {},
@@ -267,7 +260,7 @@ function getCoachForHour(hour) {
 }
 
 // ============================================================================
-// Dynamic Human Greeting & Daily Inspiration Renderer
+// Daily Member Greeting & Coach Tip Renderer
 // ============================================================================
 function renderHumanGreeting() {
   const container = document.getElementById("human-greeting-banner");
@@ -361,8 +354,8 @@ function showToast(message, type = "info", duration = 4000) {
 }
 
 // ============================================================================
-// Real ISO/IEC 18004 Standard QR Code Generator Interface
-// Connects to window.QRCodeEngine (pure JS, offline compliant, smartphone scannable)
+// QR Code Generator Interface
+// Connects to window.QRCodeEngine for rendering pass barcodes
 // ============================================================================
 function generateQRCodeSVG(text, size = 180) {
   if (window.QRCodeEngine && typeof window.QRCodeEngine.generateSVG === "function") {
@@ -451,19 +444,19 @@ function updateNavUserUI() {
   const navMyBookings = document.getElementById("nav-item-my-bookings");
   const navAdmin = document.getElementById("nav-item-admin");
 
-  // Highlight active demo persona chip if logged in; lock other chips to enforce privacy
+  // Highlight active account chip if logged in; guard others to preserve privacy
   document.querySelectorAll(".demo-chip").forEach(chip => {
     if (state.user && chip.getAttribute("data-email") === state.user.email) {
       chip.classList.add("active-user");
       chip.classList.remove("restricted");
-      chip.title = `Current Active Persona: ${state.user.name}`;
+      chip.title = `Current Account: ${state.user.name}`;
     } else if (state.user) {
       chip.classList.remove("active-user");
       chip.classList.add("restricted");
-      chip.title = "Profile privacy active: Please log out first to switch accounts.";
+      chip.title = "Please sign out before switching accounts.";
     } else {
       chip.classList.remove("active-user", "restricted");
-      chip.title = `Click to test as ${chip.textContent.trim()}`;
+      chip.title = `Sign in as ${chip.textContent.trim()}`;
     }
   });
 
@@ -682,16 +675,15 @@ function setupAuthEventListeners() {
     }
   });
 
-  // Quick Demo Persona switcher chips (strictly isolated: members cannot hop into other profiles)
+  // Quick account switcher
   document.querySelectorAll(".demo-chip").forEach(chip => {
     chip.addEventListener("click", async () => {
       const email = chip.getAttribute("data-email");
       const pass = chip.getAttribute("data-pass");
 
-      // Profile Isolation: If already logged in as a member, prevent accessing another member's profile
+      // Privacy check: If already logged in, remind member to sign out first
       if (state.user && state.user.email.toLowerCase() !== email.toLowerCase()) {
-        showToast("Profile privacy active: Please log out before switching member accounts.", "info", 4000);
-        sounds.playClick();
+        showToast("Please sign out before switching accounts.", "info", 3500);
         return;
       }
 
@@ -701,7 +693,7 @@ function setupAuthEventListeners() {
           body: JSON.stringify({ email, password: pass })
         });
         setAuth(data.token, data.user);
-        showToast(`Authenticated as: ${data.user.name} (${data.user.role})`, "success");
+        showToast(`Welcome back, ${data.user.name}!`, "success");
         navigateTo(data.user.role === "admin" ? "#admin" : "#sessions");
       } catch (err) {
         showToast(`Login error: ${err.message}`, "error");
@@ -1008,11 +1000,11 @@ function renderSessionsCards() {
 }
 
 function attachSessionButtonListeners() {
-  // 1. Optimistic Booking Action
+  // 1. Session Booking Action
   document.querySelectorAll(".btn-book").forEach(btn => {
     btn.addEventListener("click", async () => {
       if (!state.token) {
-        showToast("Please log in or pick a demo profile to reserve your workout.", "info", 4000);
+        showToast("Please sign in or create an account to reserve your workout.", "info", 4000);
         navigateTo("#login");
         return;
       }
@@ -1059,11 +1051,11 @@ function attachSessionButtonListeners() {
     });
   });
 
-  // 2. Join Waitlist Action
+  // 2. Join Standby Action
   document.querySelectorAll(".btn-join-waitlist").forEach(btn => {
     btn.addEventListener("click", async () => {
       if (!state.token) {
-        showToast("Please log in or pick a demo profile to join the standby list.", "info", 4000);
+        showToast("Please sign in or create an account to join the standby list.", "info", 4000);
         navigateTo("#login");
         return;
       }
@@ -1738,11 +1730,11 @@ function openQRModal(code, sessionInfo = null) {
     if (sessionInfo) {
       subEl.innerHTML = `Valid for <strong>${escapeHtml(sessionInfo.userName || state.user?.name || "Member")}</strong> • Session on <strong>${sessionInfo.date || ""} at ${sessionInfo.time || ""}</strong>`;
     } else {
-      subEl.textContent = "Scan with your smartphone camera or turnstile reader during your 1-hour session window:";
+      subEl.textContent = "Present this digital pass at the front desk when arriving for your session:";
     }
   }
 
-  // Generate ISO/IEC 18004 Standard compliant QR Code (210px)
+  // Generate Pass QR Code (210px)
   wrapper.innerHTML = generateQRCodeSVG(code, 210);
 
   // Security: Staff reception check-in desk button is ONLY visible if user is an Admin
@@ -1824,16 +1816,16 @@ function downloadPassTicket(code) {
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 20px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("PULSE GYM // VIP PASS", 210, 48);
+  ctx.fillText("PULSE GYM • MEMBER PASS", 210, 48);
 
   ctx.fillStyle = "#94a3b8";
   ctx.font = "12px sans-serif";
-  ctx.fillText("Guaranteed 20-Person Max Capacity Slot", 210, 70);
+  ctx.fillText("Small-Group Training Block", 210, 70);
 
   // Member & Pass Info
   ctx.fillStyle = "#00f076";
   ctx.font = "bold 13px sans-serif";
-  ctx.fillText(`MEMBER: ${state.user?.name || "VIP Member"}`, 210, 100);
+  ctx.fillText(`MEMBER: ${state.user?.name || "Pulse Member"}`, 210, 100);
 
   // Render QR Code onto temporary canvas
   const qrCanvas = document.createElement("canvas");
@@ -1864,7 +1856,7 @@ function downloadPassTicket(code) {
 
   ctx.fillStyle = "#94a3b8";
   ctx.font = "11px sans-serif";
-  ctx.fillText("DOOR CHECK-IN CODE", 210, 430);
+  ctx.fillText("FRONT DESK ENTRY CODE", 210, 430);
 
   ctx.fillStyle = "#00f076";
   ctx.font = "bold 28px monospace";
@@ -1873,8 +1865,8 @@ function downloadPassTicket(code) {
   // Footer Note
   ctx.fillStyle = "#64748b";
   ctx.font = "10px sans-serif";
-  ctx.fillText("Valid once only during session 1-hour window.", 210, 508);
-  ctx.fillText("https://github.com/Aakarshan2204/gym-slot-booking", 210, 526);
+  ctx.fillText("Present at reception during your 1-hour session window.", 210, 508);
+  ctx.fillText("Pulse Gym • 540 Fitness Boulevard, Suite 100", 210, 526);
 
   // Download Trigger
   const link = document.createElement("a");
@@ -1884,7 +1876,7 @@ function downloadPassTicket(code) {
   link.click();
   link.remove();
 
-  showToast(`VIP Door Pass saved to downloads!`, "success");
+  showToast("Digital Member Pass saved to downloads!", "success");
   sounds.playSuccess();
 }
 
@@ -2252,7 +2244,7 @@ document.addEventListener("DOMContentLoaded", () => {
     closeQRModal();
 
     if (state.user?.role !== "admin") {
-      showToast("Access restricted: Regular members cannot access administrative check-in desk.", "error", 4000);
+      showToast("Access restricted: Staff credentials required.", "error", 4000);
       return;
     }
 

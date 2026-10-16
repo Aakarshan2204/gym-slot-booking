@@ -1,9 +1,7 @@
 /**
  * ============================================================================
- * PULSE GYM — Real ISO/IEC 18004 Standard QR Code Engine
- * 100% Pure JavaScript, Zero External Dependencies, Offline Compliant.
- * Generates standards-compliant, scannable QR codes readable by any
- * smartphone camera (iOS Camera, Google Lens, Samsung Camera, Barcode guns).
+ * Pulse Gym - QR Code Generator
+ * Lightweight barcode renderer for member entry passes.
  * ============================================================================
  */
 
@@ -554,7 +552,7 @@
   // --------------------------------------------------------------------------
   const QRCodeEngine = {
     /**
-     * Generate an ISO/IEC 18004 compliant SVG QR Code.
+     * Generate an SVG QR Code.
      * @param {string} text - Content to encode (e.g. check-in code or URL).
      * @param {object} options - Configuration options { size, margin, darkColor, lightColor }
      * @returns {string} Clean SVG markup string.
