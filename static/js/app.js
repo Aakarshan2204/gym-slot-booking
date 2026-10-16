@@ -1433,15 +1433,34 @@ function setupSessionsFilterListeners() {
   });
 }
 
-// Background Polling for Live Seat Updates (4 second interval)
+// Background Polling for Live Seat, Waitlist & Roster Updates (3 second interval)
+// Strictly enforces "Nobody refreshes anything" across all views
 function startPolling() {
   stopPolling();
-  state.pollingTimer = setInterval(() => {
-    // Only poll if document is visible and user is on sessions page
-    if (document.visibilityState === "visible" && window.location.hash === "#sessions") {
+  state.pollingTimer = setInterval(async () => {
+    if (document.visibilityState !== "visible") return;
+    const hash = window.location.hash || "#sessions";
+
+    if (hash === "#sessions") {
       fetchSessions(true);
+    } else if (hash === "#my-bookings" && state.token) {
+      try {
+        const data = await apiRequest("/api/my-bookings");
+        const currentTickets = document.querySelectorAll("#my-confirmed-list .ticket-card").length;
+        renderMyConfirmedList(data.bookings || []);
+        renderMyWaitlist(data.waitlist || []);
+        startCountdownUpdater();
+        if (data.bookings && data.bookings.length > currentTickets && currentTickets > 0) {
+          showToast("A spot opened up! You were automatically booked from standby.", "success", 5000);
+        }
+      } catch (_) {}
+    } else if (hash === "#admin" && state.user?.role === "admin") {
+      loadAdminStats();
+      if (state.adminRosterSessionId) {
+        loadSessionRoster(state.adminRosterSessionId);
+      }
     }
-  }, 4000);
+  }, 3000);
 }
 
 function stopPolling() {
