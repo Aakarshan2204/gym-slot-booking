@@ -4,6 +4,32 @@ All notable changes to the **PULSE GYM** Slot Booking & Door Check-In System wil
 
 The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`v<MAJOR>.<MINOR>.<PATCH>`).
 
+## [v1.2.3] - 2026-10-16
+
+### 🚀 Summary of Improvements Over v1.2.2
+Version 1.2.3 permanently eliminates the recurring *"error in website on new day"* and *"schedules not coming up"* issues. It fixes the flawed calendar synchronization condition that previously skipped seeding when an evening slot was pre-scheduled, ensures Sarah Connor always has an active live pass for the current hour, filters out past expired days from the default timetable, extends JWT authentication persistence from 24 hours to 30 days so users never wake up to expired session errors, scrubs dead tokens before initial page requests, and standardizes exercise property names across backend and frontend to eliminate broken image requests (`/undefined`).
+
+### 🔍 Side-by-Side Comparison: What Improved from v1.2.2 to v1.2.3?
+
+| Area / Feature | In v1.2.2 | In v1.2.3 (Improved) | Real-World Impact |
+| :--- | :--- | :--- | :--- |
+| **New-Day Schedule Engine** | Evaluated only `COUNT(*) WHERE date = today AND start_hour = now_hour`. If an evening slot (18:00) existed, seeding was skipped, leaving 0 upcoming sessions for the rest of today and all buttons disabled as *"Session Ended"* or *"In Progress"*. | **4-Point Autonomous Schedule Heuristic**: Verifies active slot at current hour, Sarah's active confirmed booking, upcoming open slots today (`start_hour > now_hour`), and tomorrow's 5 multi-period sessions. | The timetable is **perpetually alive** with bookable open slots and full waitlist slots on every day at every hour! |
+| **Default Timetable Feed** | Returned all historical sessions from days ago sorted ascending. Users opened the website and were greeted by 9+ old *"Session Ended"* cards from previous days. | **Current-and-Upcoming Scoped Timetable**: `GET /api/sessions` without date filter defaults to `s.date >= today_str`. Historical dates remain fully accessible via the calendar picker. | Users immediately see **Today's Active and Upcoming sessions** front and center without scrolling past old ended slots! |
+| **Sarah Connor Live Check-In Pass** | Sarah was only booked at 11:00 AM. Opening the app after 12:00 PM caused her pass to show *"Session Ended"* and reception check-in to throw `400 CHECKIN_WINDOW_EXPIRED`. | **Dynamic Active Hour Booking**: Auto-seeder guarantees Sarah Connor has a confirmed reservation for the current active hour (`now_hour`) with door code `7XKP2Q` or valid code. | Sarah's **live check-in pass ALWAYS has an open window** with countdown timer, VIP QR code, and working reception desk check-in! |
+| **Overnight Authentication Persistence** | JWT tokens expired after 24 hours (`JWT_EXPIRES_IN_HOURS=24`). Opening the site the next morning sent an expired token, triggering a `401 Unauthorized` toast and displaying red error banners. | **30-Day Token Lifespan (`720h`) & Client Scrubbing**: Stored tokens remain valid for 30 days. Client-side bootstrap checks JWT timestamp and silently clears dead tokens before API calls. | **Zero "Session expired" banners or toasts** when returning to the website on a new day. |
+| **Exercise Media Property Interop** | Backend returned snake_case (`exercise_photo`, `primary_exercise`), while frontend accessed camelCase (`muscleInfo.exercisePhoto`). Browser requested `http://localhost:8000/undefined` on every poll. | **Dual-Key Normalization & Safe Fallbacks**: `server.py` outputs both camelCase and snake_case aliases; `app.js` employs defensive fallbacks (`muscleInfo.exercisePhoto \|\| muscleInfo.exercise_photo`). | Eliminates `GET /undefined` console errors and guarantees crisp workout posters and movement tags render seamlessly. |
+| **Startup Working Directory (`start.bat`)** | Running `start.bat` as Administrator or via desktop shortcut launched in `C:\Windows\System32`, causing `python server.py` to fail with `file not found`. | **Self-Locating Directory Resolution (`cd /d "%~dp0"`)**: Batch script explicitly changes working directory to the project root before launching Python. | Server reliably boots up regardless of how or from where `start.bat` is executed. |
+
+### 🐛 Bug Fixes
+- **Auto-Seeder Trigger (`server.py`)**: Upgraded `ensure_current_sessions()` to verify: (1) active session at current hour exists, (2) Sarah Connor has a confirmed reservation, (3) upcoming slots exist today (`now_hour < 22`), and (4) tomorrow has scheduled slots.
+- **Default Feed Scoping (`server.py`)**: Added `WHERE s.date >= ?` to default `GET /api/sessions` query to prevent old sessions from 2026-10-13..2026-10-15 from pushing today's active sessions below the fold.
+- **Token Expiry Scrubbing (`app.js`)**: Added `isTokenExpired()` helper decoding the JWT payload expiration (`exp * 1000 <= Date.now()`) during initialization to silently remove stale credentials without raising 401 exceptions.
+- **Extended Token Expiration (`auth.py`)**: Increased default JWT lifetime from 24 hours to 720 hours (30 days) so user sessions comfortably persist across day-to-day gym visits.
+- **Defensive Card Rendering (`app.js`)**: Wrapped `muscleInfo` attributes with fallback defaults so missing split metadata never aborts `renderSessionsCards()` or triggers the `sessions-error` banner.
+- **Tomorrow Session Guarantee (`seed.py`)**: Added morning (09:00, 11:00), afternoon (14:00), full evening with waitlist (18:00), and late evening (20:00) sessions for tomorrow.
+
+---
+
 ## [v1.2.2] - 2026-10-15
 
 ### 🚀 Summary of Improvements Over v1.2.1

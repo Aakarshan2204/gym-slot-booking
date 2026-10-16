@@ -20,7 +20,7 @@ import jwt
 
 JWT_SECRET = os.environ.get("JWT_SECRET", "super_secret_gym_jwt_key_change_in_production_min_32_chars!")
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = int(os.environ.get("JWT_EXPIRES_IN_HOURS", "24"))
+JWT_EXPIRATION_HOURS = int(os.environ.get("JWT_EXPIRES_IN_HOURS", "720"))
 
 # Ambiguous characters (0, O, 1, I) excluded to prevent transcribing errors at the gym door
 CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"

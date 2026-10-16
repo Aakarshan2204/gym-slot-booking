@@ -74,9 +74,29 @@ def seed_database():
                 (session_now_id, sarah_id, code_now)
             )
 
-        # 2. Upcoming Full Session Today (for waitlist / concurrency testing)
-        if current_hour < 23:
+        # 2. Upcoming Sessions Today (if current_hour < 23)
+        # A: Next hour is an OPEN bookable session (so users can immediately test booking!)
+        if current_hour + 1 <= 23:
+            s_open_id = make_session(today, current_hour + 1)
+            # Ensure it is open with free seats: seed 4 bookings, leaving 16 open seats
+            cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (s_open_id,))
+            if cursor.fetchone()[0] == 0:
+                for uid in synthetic_member_ids[:4]:
+                    cursor.execute(
+                        """INSERT OR IGNORE INTO bookings (session_id, user_id, status, check_in_code)
+                           VALUES (?, ?, 'confirmed', ?)""",
+                        (s_open_id, uid, generate_check_in_code())
+                    )
+
+        # B: Next+2 hour is a FULL session with waitlist (for testing waitlist queue & FIFO promotion)
+        if current_hour + 2 <= 23:
+            full_hour = current_hour + 2
+        elif current_hour + 1 <= 23:
             full_hour = current_hour + 1
+        else:
+            full_hour = None
+
+        if full_hour is not None:
             session_full_id = make_session(today, full_hour)
             cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (session_full_id,))
             booked_count = cursor.fetchone()[0]
@@ -100,9 +120,13 @@ def seed_database():
                     (session_full_id, alex_id, (now - datetime.timedelta(minutes=15)).isoformat())
                 )
 
-        # 3. Tomorrow Sessions (guarantee morning, midday, evening slots)
+        # C: Extra late session if early enough
+        if current_hour < 21:
+            make_session(today, 22)
+
+        # 3. Tomorrow Sessions (guarantee morning, midday, afternoon, full evening, and night slots)
         make_session(tomorrow, 9)   # 20 free
-        s_tom_2 = make_session(tomorrow, 11)  # Midday slot
+        s_tom_2 = make_session(tomorrow, 11)  # Midday slot (Sarah booked, 12 free)
         cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (s_tom_2,))
         if cursor.fetchone()[0] < 8:
             for uid in synthetic_member_ids[:8]:
@@ -119,7 +143,30 @@ def seed_database():
                 (s_tom_2, sarah_id, generate_check_in_code())
             )
 
-        make_session(tomorrow, 18)  # Evening slot
+        make_session(tomorrow, 14)  # Afternoon slot (20 free)
+
+        s_tom_full = make_session(tomorrow, 18)  # Evening slot (FULL with waitlist)
+        cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (s_tom_full,))
+        tom_booked = cursor.fetchone()[0]
+        if tom_booked < 20:
+            for uid in synthetic_member_ids[:(20 - tom_booked)]:
+                cursor.execute(
+                    """INSERT OR IGNORE INTO bookings (session_id, user_id, status, check_in_code)
+                       VALUES (?, ?, 'confirmed', ?)""",
+                    (s_tom_full, uid, generate_check_in_code())
+                )
+        cursor.execute("SELECT COUNT(*) FROM waitlist WHERE session_id = ? AND status = 'waiting'", (s_tom_full,))
+        if cursor.fetchone()[0] == 0:
+            cursor.execute(
+                "INSERT OR IGNORE INTO waitlist (session_id, user_id, status, created_at) VALUES (?, ?, 'waiting', ?)",
+                (s_tom_full, mike_id, (now - datetime.timedelta(minutes=30)).isoformat())
+            )
+            cursor.execute(
+                "INSERT OR IGNORE INTO waitlist (session_id, user_id, status, created_at) VALUES (?, ?, 'waiting', ?)",
+                (s_tom_full, alex_id, (now - datetime.timedelta(minutes=15)).isoformat())
+            )
+
+        make_session(tomorrow, 20)  # Late evening slot (20 free)
 
         # 4. Multi-day schedule for the rest of the week (next 6 days)
         for day_offset in range(2, 7):

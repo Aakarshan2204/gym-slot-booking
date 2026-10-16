@@ -13,14 +13,34 @@
 // ============================================================================
 // State Management & Constants
 // ============================================================================
-let savedUser = null;
-try {
-  const rawUser = localStorage.getItem("pulse_user");
-  if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
-    savedUser = JSON.parse(rawUser);
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return true;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
+    return !payload.exp || (payload.exp * 1000) <= Date.now();
+  } catch (_) {
+    return true;
   }
-} catch (_) {
-  savedUser = null;
+}
+
+let savedToken = localStorage.getItem("pulse_token") || null;
+let savedUser = null;
+if (savedToken && isTokenExpired(savedToken)) {
+  savedToken = null;
+  localStorage.removeItem("pulse_token");
+  localStorage.removeItem("pulse_user");
+} else {
+  try {
+    const rawUser = localStorage.getItem("pulse_user");
+    if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
+      savedUser = JSON.parse(rawUser);
+    }
+  } catch (_) {
+    savedUser = null;
+  }
 }
 
 // ============================================================================
@@ -193,7 +213,7 @@ function getSplitForDate(dateStr) {
 const currentDayName = DAY_NAMES[new Date().getDay()] || "Thursday";
 
 const state = {
-  token: localStorage.getItem("pulse_token") || null,
+  token: savedToken,
   user: savedUser,
   sessions: [],
   selectedDate: null,
@@ -847,8 +867,14 @@ function renderSessionsCards() {
     const currentHour = new Date().getHours();
     const isHappeningNow = session.date === todayStr && session.start_hour === currentHour;
 
-    // Daily Muscle Split Data
+    // Daily Muscle Split Data with complete fallbacks
     const muscleInfo = session.muscle_target || getSplitForDate(session.date);
+    const primaryExercise = muscleInfo.primaryExercise || muscleInfo.primary_exercise || "General Training";
+    const exercisePhoto = muscleInfo.exercisePhoto || muscleInfo.exercise_photo || "";
+    const badgeName = muscleInfo.badge || muscleInfo.muscle || "Gym Training";
+    const badgeColor = muscleInfo.color || "#00F076";
+    const badgeIcon = muscleInfo.icon || "⚡";
+    const dayName = muscleInfo.day || "";
 
     // Card status classes
     const cardClass = [
@@ -901,13 +927,13 @@ function renderSessionsCards() {
         <div>
           <!-- Muscle Target Strip -->
           <div class="session-card-muscle-strip">
-            <span class="muscle-badge-pill" style="background: ${muscleInfo.color}22; color: ${muscleInfo.color}; border: 1px solid ${muscleInfo.color}55;">
-              ${muscleInfo.icon} ${muscleInfo.day}: ${muscleInfo.badge}
+            <span class="muscle-badge-pill" style="background: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}55;">
+              ${badgeIcon} ${dayName}: ${badgeName}
             </span>
             <button type="button" class="muscle-thumb-btn btn-open-exercise-preview"
-              data-day="${muscleInfo.day}"
-              title="Click to view ${muscleInfo.badge} exercise guide & poster">
-              <img src="${muscleInfo.exercisePhoto}" alt="${muscleInfo.badge}">
+              data-day="${dayName}"
+              title="Click to view ${badgeName} exercise guide & poster">
+              <img src="${exercisePhoto}" alt="${badgeName}">
             </button>
           </div>
 
@@ -936,7 +962,7 @@ function renderSessionsCards() {
           <!-- Movement Focus Tag -->
           <div style="font-size: 0.78rem; color: var(--text-secondary); margin: 6px 0 10px; display: flex; align-items: center; gap: 6px;">
             <span>🎯</span>
-            <span><strong>Target:</strong> ${escapeHtml(muscleInfo.primaryExercise)}</span>
+            <span><strong>Target:</strong> ${escapeHtml(primaryExercise)}</span>
           </div>
 
           <!-- Capacity Meter -->
@@ -1479,6 +1505,7 @@ function renderMyConfirmedList(bookings) {
     const canCancel = b.can_cancel;
 
     const timeFormatted = `${String(b.start_hour).padStart(2, "0")}:00 - ${String((b.start_hour + 1) % 24).padStart(2, "0")}:00`;
+    const muscleInfo = b.muscle_target || getSplitForDate(b.date);
 
     return `
       <article class="ticket-card ${isLive ? 'live-window' : ''}" id="booking-ticket-${b.id}" data-start="${b.start_time}" data-end="${b.end_time}">
@@ -1498,7 +1525,17 @@ function renderMyConfirmedList(bookings) {
             <span style="font-size: 0.85rem; color: var(--text-muted);">${formatDate(b.date)}</span>
           </div>
 
-          <h3 class="ticket-title">${timeFormatted} Gym Session</h3>
+          <!-- Muscle Target Badge on Ticket -->
+          <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 8px;">
+            <span class="muscle-badge-pill" style="background: ${muscleInfo.color}22; color: ${muscleInfo.color}; border: 1px solid ${muscleInfo.color}55;">
+              ${muscleInfo.icon} ${muscleInfo.day}: ${muscleInfo.badge}
+            </span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">
+              Target: <strong>${escapeHtml(muscleInfo.primaryExercise)}</strong>
+            </span>
+          </div>
+
+          <h3 class="ticket-title" style="margin-top: 6px;">${timeFormatted} Gym Session</h3>
           <p class="ticket-time">1-Hour High Intensity Block • 20 Person Cap</p>
 
           <!-- Real-time Countdown Banner -->
@@ -1596,17 +1633,21 @@ function renderMyWaitlist(waitlist) {
 
   container.innerHTML = waitlist.map(w => {
     const timeFormatted = `${String(w.start_hour).padStart(2, "0")}:00 - ${String((w.start_hour + 1) % 24).padStart(2, "0")}:00`;
+    const muscleInfo = w.muscle_target || getSplitForDate(w.date);
 
     return `
       <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div>
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
             <span class="badge badge-waitlist">Position #${w.position} in line</span>
+            <span class="muscle-badge-pill" style="background: ${muscleInfo.color}22; color: ${muscleInfo.color}; border: 1px solid ${muscleInfo.color}55;">
+              ${muscleInfo.icon} ${muscleInfo.badge}
+            </span>
             <span style="font-size: 0.85rem; color: var(--text-muted);">${formatDate(w.date)}</span>
           </div>
-          <h4 style="font-size: 1.1rem; margin-top: 4px;">${timeFormatted} Session</h4>
+          <h4 style="font-size: 1.1rem; margin-top: 6px;">${timeFormatted} Session</h4>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
-            Joined: ${new Date(w.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Auto-promotion active until session start
+            Target: <strong>${escapeHtml(muscleInfo.primaryExercise)}</strong> • Joined: ${new Date(w.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • Auto-promotion active
           </p>
         </div>
         <button type="button" class="btn btn-secondary btn-sm btn-leave-waitlist-page" data-waitlist-id="${w.id}">
@@ -2104,6 +2145,20 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAuthEventListeners();
   setupSessionsFilterListeners();
   setupAdminEventListeners();
+
+  // Initialize Weekly Muscle Target Split Showcase
+  renderWeeklySplitSection(state.activeSplitDay);
+
+  // Weekly Split Nav link scroll
+  document.getElementById("nav-split")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (window.location.hash !== "#sessions") {
+      navigateTo("#sessions");
+    }
+    setTimeout(() => {
+      document.getElementById("weekly-split-section")?.scrollIntoView({ behavior: "smooth" });
+    }, 120);
+  });
 
   // Sound toggle listener
   document.getElementById("btn-sound-toggle")?.addEventListener("click", () => {

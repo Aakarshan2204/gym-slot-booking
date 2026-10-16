@@ -186,9 +186,17 @@ def get_muscle_target_for_date(date_str: str) -> Dict[str, Any]:
     try:
         dt = datetime.date.fromisoformat(date_str)
         day_name = dt.strftime("%A")
-        return TRAINING_SPLIT.get(day_name, TRAINING_SPLIT["Monday"])
+        raw = dict(TRAINING_SPLIT.get(day_name, TRAINING_SPLIT["Monday"]))
     except Exception:
-        return TRAINING_SPLIT["Monday"]
+        raw = dict(TRAINING_SPLIT["Monday"])
+
+    # Provide both camelCase and snake_case keys for seamless frontend interop
+    raw["exercisePhoto"] = raw.get("exercise_photo")
+    raw["primaryExercise"] = raw.get("primary_exercise")
+    raw["targetMuscles"] = raw.get("target_muscles", [])
+    raw["estimatedBurn"] = raw.get("estimated_burn")
+    raw["isHoliday"] = raw.get("is_holiday", False)
+    return raw
 
 class APIError(Exception):
     """Custom API exception for structured error responses."""
@@ -695,6 +703,10 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             if date_filter:
                 query += " WHERE s.date = ?"
                 params.append(date_filter)
+            else:
+                # Default timetable view: show from today onwards so past expired sessions don't clutter the UI
+                query += " WHERE s.date >= ?"
+                params.append(datetime.date.today().isoformat())
             query += " ORDER BY s.date ASC, s.start_hour ASC"
 
             cursor.execute(query, params)
@@ -1245,7 +1257,7 @@ def ensure_current_sessions(force: bool = False):
     global _last_session_refresh_check
     import time
     now_ts = time.time()
-    if not force and (now_ts - _last_session_refresh_check < 30.0):
+    if not force and (now_ts - _last_session_refresh_check < 10.0):
         return
     _last_session_refresh_check = now_ts
 
@@ -1258,14 +1270,34 @@ def ensure_current_sessions(force: bool = False):
         with get_db() as conn:
             cursor = conn.cursor()
             # 1. Does an active session exist for today at current hour?
-            cursor.execute("SELECT COUNT(*) FROM sessions WHERE date = ? AND start_hour = ?", (today_str, now_hour))
-            has_current_hour = cursor.fetchone()[0] > 0
+            cursor.execute("SELECT id FROM sessions WHERE date = ? AND start_hour = ?", (today_str, now_hour))
+            cur_sess = cursor.fetchone()
+            has_current_hour = cur_sess is not None
 
-            # 2. Does at least one session exist for tomorrow?
+            # 2. Is Sarah Connor confirmed for the current hour so her live check-in pass works?
+            has_sarah_active = False
+            if cur_sess:
+                cursor.execute("""
+                    SELECT b.id FROM bookings b 
+                    JOIN users u ON b.user_id = u.id 
+                    WHERE b.session_id = ? AND u.email = 'sarah@gympulse.com' AND b.status = 'confirmed'
+                """, (cur_sess[0],))
+                has_sarah_active = cursor.fetchone() is not None
+
+            # 3. Are there upcoming sessions scheduled for today after current hour?
+            has_upcoming_today = True
+            if now_hour < 22:
+                cursor.execute("""
+                    SELECT COUNT(*) FROM sessions 
+                    WHERE date = ? AND start_hour > ?
+                """, (today_str, now_hour))
+                has_upcoming_today = cursor.fetchone()[0] > 0
+
+            # 4. Does tomorrow have at least one session?
             cursor.execute("SELECT COUNT(*) FROM sessions WHERE date = ?", (tomorrow_str,))
             has_tomorrow = cursor.fetchone()[0] > 0
 
-            if not has_current_hour or not has_tomorrow:
+            if not has_current_hour or not has_sarah_active or not has_upcoming_today or not has_tomorrow:
                 print(f"[SCHEDULE SYNC] Refreshing sessions for {today_str} (hour {now_hour}) and upcoming days...")
                 from seed import seed_database
                 seed_database()
