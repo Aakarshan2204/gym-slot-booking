@@ -1,14 +1,14 @@
 # PULSE GYM — Online Session Booking & Door Check-In System
 
-> **Take-Home Challenge Implementation**  
-> A high-concurrency gym session booking system that eliminates overbooking and doorstep arguments through atomic seat reservations, automated FIFO waitlist promotions, and cryptographically unguessable check-in passes.
+> **Production-Grade Athletic Club Booking & Member Access Engine**  
+> A high-concurrency gym session booking system that eliminates overbooking and doorstep congestion through atomic seat reservations, automated FIFO waitlist promotions, and digital member check-in passes.
 
 [![Latest Release](https://img.shields.io/github/v/release/Aakarshan2204/gym-slot-booking?color=10b981&label=Latest%20Version)](https://github.com/Aakarshan2204/gym-slot-booking/releases)
 [![Changelog](https://img.shields.io/badge/Changelog-Keep%20a%20Changelog-3b82f6)](CHANGELOG.md)
 
 ---
 
-## 1. Design Note (Stack & Data Model)
+## 1. Architecture Overview (Stack & Data Model)
 
 ```text
 Stack: Python 3.13 backend (HTTP server with SQLite WAL mode), bcrypt password hashing, HS256 JWT auth, and Vanilla ES6 SPA frontend.
@@ -45,18 +45,18 @@ Open your browser to: **`http://localhost:8000`**
 
 ---
 
-## 3. Test Credentials & Demo Data
+## 3. Test Credentials & Demo Accounts
 
-The database comes pre-seeded with realistic test accounts across multiple days, including an active session right now and a **fully booked session (20/20 seats)** with members waiting in line.
+The database comes pre-seeded with realistic member and staff accounts across multiple days, including an active session right now and a **fully booked session (20/20 seats)** with members waiting in line.
 
 | Role | Name | Email | Password | Pre-configured State |
 | :--- | :--- | :--- | :--- | :--- |
-| **Admin** | Gym Administrator | `admin@gympulse.com` | `AdminPass123!` | Created directly in DB; staff check-in & roster management |
-| **Member** | Sarah Connor | `sarah@gympulse.com` | `MemberPass123!` | Has active booking right now (Code: `7XKP2Q`) & tomorrow |
-| **Member** | Mike Tyson | `mike@gympulse.com` | `MemberPass123!` | **Position #1 on Waitlist** for the full session |
-| **Member** | Alex Johnson | `alex@gympulse.com` | `MemberPass123!` | **Position #2 on Waitlist** for the full session |
+| **Admin** | Front Desk Staff | `admin@gympulse.com` | `AdminPass123!` | Staff reception desk check-in & roster management |
+| **Member** | Sarah Connor | `sarah@gympulse.com` | `MemberPass123!` | Has active booking right now & tomorrow |
+| **Member** | Mike Miller | `mike@gympulse.com` | `MemberPass123!` | **Position #1 on Waitlist** for the full session |
+| **Member** | Alex Mercer | `alex@gympulse.com` | `MemberPass123!` | **Position #2 on Waitlist** for the full session |
 
-> 💡 **Quick Persona Switcher:** The top demo bar on the website allows 1-click instant login into any of these personas without typing credentials!
+> 💡 **Quick Sign-In Bar:** The header bar provides 1-click test access to pre-configured accounts without manually retyping credentials.
 
 ---
 
@@ -88,26 +88,24 @@ The database comes pre-seeded with realistic test accounts across multiple days,
 
 ---
 
-## 5. Assumptions
+## 5. Facility Rules & Operational Parameters
 
-As permitted by challenge guidelines:
-1. **Gym Opening Hours & Sessions**: Sessions are 1-hour in length and start on the hour (e.g. 09:00 to 10:00). Capacity defaults to 20.
-2. **Cancellation Cutoff**: Members can cancel anytime prior to the start time (`now < session.start_time`). Once a session starts, bookings cannot be cancelled.
+1. **Gym Opening Hours & Sessions**: Small-group training blocks are 1 hour in length, scheduled throughout daytime hours with an optimal 20-athlete facility capacity.
+2. **Cancellation Cutoff**: Members can cancel anytime prior to the start time (`now < session.start_time`). Once a session starts, bookings cannot be cancelled to preserve coach planning.
 3. **Check-In Window**: Code redemption is strictly allowed from session start time until session end time (`start_time <= now <= end_time`). Attempting check-in before session start returns `CHECKIN_WINDOW_EARLY (400)`, and after session end returns `CHECKIN_WINDOW_EXPIRED (400)`.
-4. **Admin Account Creation**: Admins cannot be created via public registration (`POST /api/auth/register` strictly creates `role='member'`). Admins are created directly in the database or via seed scripts.
+4. **Staff Desk Administration**: Reception desk accounts are provisioned directly in the backend (`POST /api/auth/register` creates `role='member'`), preventing unauthorized elevation.
 
 ---
 
-## 6. Extra Features Added
+## 6. Built-In Member & Administrative Features
 
-Beyond the required take-home specification, the following production-grade features were implemented:
-1. **High-Contrast QR Code Pass**: Every confirmed ticket renders an SVG QR code. Members can display the QR code at the desk, and admins can scan or read it.
-2. **Live Check-In Countdown Timer**: Real-time ticker displaying countdown to check-in window opening, active window remaining time, and expiration.
-3. **Live Waitlist Position Tracker**: Members see their exact real-time standby queue position (e.g., *"Position #1 in queue"*).
-4. **Instant Persona Switcher Bar**: Switch between Admin, Booked Member, Waitlisted Member, and New Member in 1 click for rapid testing.
-5. **Gym Analytics Dashboard**: Admin portal provides real-time statistics on total sessions, confirmed seats, door attendance rate %, and facility capacity utilization %.
-6. **Web Audio Synthesizer**: Subtle tactile harmonic chimes on check-in validation and booking confirmation using browser Web Audio API (zero audio file dependencies).
-7. **Session Availability Filters**: Filter sessions by date, available seats only, or full sessions.
+1. **Digital Pass Card & QR Engine**: Every confirmed ticket renders a clean, scannable QR code pass. Members can present the pass at reception, save it as a digital card, or display the 6-character code.
+2. **Live Check-In Countdown Ticker**: Real-time counter displaying when the reception desk window opens, remaining active time, and completion status.
+3. **Standby Queue Tracker**: Members on standby see their exact live position in the queue (e.g., *"Position #1 on Standby"*).
+4. **"Meet Your Gym Family" Coaching Showcase**: Highlights certified floor trainers on duty with credentials, form advice, and hourly station badges.
+5. **Time-of-Day Community Greeting**: Dynamic greeting banner offering personalized encouragement and rotating daily coach tips.
+6. **Front Desk Analytics**: Staff portal provides real-time visibility into active training blocks, confirmed athletes, and door check-in rates.
+7. **Session Availability Filters**: Filter timetable by date, available spots, and workout focus.
 
 ---
 
