@@ -3,8 +3,11 @@
 > **Production-Grade Athletic Club Booking & Member Access Engine**  
 > A high-concurrency gym session booking system that eliminates overbooking and doorstep congestion through atomic seat reservations, automated FIFO waitlist promotions, and digital member check-in passes.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-00F076)](https://gym-slot-booking-g7v8.onrender.com)
 [![Latest Release](https://img.shields.io/github/v/release/Aakarshan2204/gym-slot-booking?color=10b981&label=Latest%20Version)](https://github.com/Aakarshan2204/gym-slot-booking/releases)
 [![Changelog](https://img.shields.io/badge/Changelog-Keep%20a%20Changelog-3b82f6)](CHANGELOG.md)
+
+**Live Website:** [https://gym-slot-booking-g7v8.onrender.com](https://gym-slot-booking-g7v8.onrender.com)
 
 ---
 
