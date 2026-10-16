@@ -25,7 +25,7 @@ from auth import (
 )
 
 PORT = int(os.environ.get("PORT", 8000))
-HOST = os.environ.get("HOST", "127.0.0.1")
+HOST = os.environ.get("HOST", "0.0.0.0")
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
 # ============================================================================
