@@ -9,14 +9,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%2300F076%22/><text x=%2250%22 y=%2265%22 font-family=%22sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23070b12%22>P</text></svg>">
   <script>
     if (window.location.protocol === "file:") {
       window.addEventListener("DOMContentLoaded", () => {
         document.body.innerHTML = `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif; background: #070b12; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;">
             <div style="background: #0f172a; border: 1px solid #38bdf8; border-radius: 16px; max-width: 580px; padding: 36px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);">
-              <div style="font-size: 52px; margin-bottom: 16px;">⚡</div>
+              <div style="font-size: 32px; font-weight: 900; color: #00F076; margin-bottom: 16px;">PULSE</div>
               <h2 style="color: #38bdf8; font-size: 1.6rem; margin-bottom: 12px; font-weight: 800;">Start Local Server</h2>
               <p style="color: #94a3b8; font-size: 1rem; line-height: 1.6; margin-bottom: 24px;">
                 You opened this HTML file directly from disk (<code>file:///</code>). Modern web APIs and QR security require running via the local server.
@@ -40,20 +40,20 @@
   <!-- Quick Sign-In Bar -->
   <header class="demo-bar" id="demo-bar" aria-label="Quick Account Switcher">
     <div class="demo-bar-title">
-      <span>🔑 Quick Sign-In:</span>
+      <span>Quick Sign-In:</span>
     </div>
     <div class="demo-personas" id="demo-personas-container">
       <button type="button" class="demo-chip admin" data-email="admin@gympulse.com" data-pass="AdminPass123!" title="Staff Access">
-        🛡️ Staff Desk
+        Staff Desk
       </button>
       <button type="button" class="demo-chip" data-email="sarah@gympulse.com" data-pass="MemberPass123!" title="Member Account">
-        👤 Sarah Connor
+        Sarah Connor
       </button>
       <button type="button" class="demo-chip" data-email="mike@gympulse.com" data-pass="MemberPass123!" title="Member Account">
-        👤 Mike Miller
+        Mike Miller
       </button>
       <button type="button" class="demo-chip" data-email="alex@gympulse.com" data-pass="MemberPass123!" title="Member Account">
-        👤 Alex Mercer
+        Alex Mercer
       </button>
     </div>
   </header>
@@ -114,7 +114,7 @@
   <div class="modal-overlay" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
     <div class="modal-content vip-ticket-modal">
       <button type="button" class="modal-close" id="qr-modal-close" aria-label="Close modal">&times;</button>
-      <div class="vip-ticket-badge">⚡ DIGITAL ENTRY PASS</div>
+      <div class="vip-ticket-badge">DIGITAL ENTRY PASS</div>
       <h3 id="qr-modal-title" class="vip-modal-title">Member Check-In Pass</h3>
       <p id="qr-modal-subtitle" class="vip-modal-subtitle">
         Present this QR code or 6-character code at the front desk when arriving for your session:
@@ -135,13 +135,13 @@
 
       <div class="modal-action-buttons">
         <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-qr-code">
-          📋 Copy Code
+          Copy Code
         </button>
         <button type="button" class="btn btn-secondary btn-sm" id="btn-download-qr-ticket">
-          💾 Save Pass
+          Save Pass
         </button>
         <button type="button" class="btn btn-primary btn-sm" id="btn-test-checkin-modal" style="display: none;">
-          🛡️ Staff Check-In Desk
+          Staff Check-In Desk
         </button>
       </div>
     </div>
@@ -153,7 +153,7 @@
       <button type="button" class="modal-close" id="profile-modal-close" aria-label="Close profile modal">&times;</button>
       
       <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar">👤</div>
+        <div class="profile-avatar" id="profile-avatar">M</div>
         <div class="profile-title-block">
           <div class="profile-badge-row">
             <span class="user-role" id="profile-role-badge">Member</span>
@@ -165,7 +165,7 @@
       </div>
 
       <div class="profile-privacy-banner">
-        <span class="privacy-icon">🛡️</span>
+        <span class="privacy-icon">•</span>
         <div>
           <strong>Account Privacy & Security</strong>
           <p>Your session bookings, door access codes, and profile information are private to your account.</p>
@@ -192,7 +192,7 @@
       </div>
 
       <div class="profile-actions">
-        <a href="#my-bookings" class="btn btn-primary btn-sm" id="btn-profile-view-tickets">🎟️ View My Passes</a>
+        <a href="#my-bookings" class="btn btn-primary btn-sm" id="btn-profile-view-tickets">View My Passes</a>
         <button type="button" class="btn btn-secondary btn-sm" id="btn-profile-logout">Sign Out</button>
       </div>
     </div>
@@ -300,28 +300,28 @@
           </p>
           <div class="hero-stats-row">
             <div class="hero-stat-pill">
-              <span class="stat-pill-icon">🏋️‍♂️</span>
+              <span class="stat-pill-icon">01</span>
               <div>
                 <strong>20-Athlete Limit</strong>
                 <small>Guaranteed bench & rack space</small>
               </div>
             </div>
             <div class="hero-stat-pill">
-              <span class="stat-pill-icon">🤝</span>
+              <span class="stat-pill-icon">02</span>
               <div>
                 <strong>Floor Coaching</strong>
                 <small>Certified coaches on duty</small>
               </div>
             </div>
             <div class="hero-stat-pill">
-              <span class="stat-pill-icon">⏳</span>
+              <span class="stat-pill-icon">03</span>
               <div>
                 <strong>Standby Priority</strong>
                 <small>Auto spots when plans change</small>
               </div>
             </div>
             <div class="hero-stat-pill">
-              <span class="stat-pill-icon">📱</span>
+              <span class="stat-pill-icon">04</span>
               <div>
                 <strong>Digital Entry Pass</strong>
                 <small>Quick contactless desk check-in</small>
@@ -355,37 +355,37 @@
         <!-- 7-Day Interactive Selector Bar -->
         <div class="split-day-nav" role="tablist" id="split-day-nav-bar">
           <button type="button" class="split-day-btn" data-day="Monday" role="tab" aria-selected="false">
-            <span class="sdb-icon">💥</span>
+            <span class="sdb-icon">M</span>
             <span class="sdb-day">Mon</span>
             <span class="sdb-target">Chest</span>
           </button>
           <button type="button" class="split-day-btn" data-day="Tuesday" role="tab" aria-selected="false">
-            <span class="sdb-icon">🦅</span>
+            <span class="sdb-icon">T</span>
             <span class="sdb-day">Tue</span>
             <span class="sdb-target">Back</span>
           </button>
           <button type="button" class="split-day-btn" data-day="Wednesday" role="tab" aria-selected="false">
-            <span class="sdb-icon">💪</span>
+            <span class="sdb-icon">W</span>
             <span class="sdb-day">Wed</span>
             <span class="sdb-target">Arms</span>
           </button>
           <button type="button" class="split-day-btn" data-day="Thursday" role="tab" aria-selected="false">
-            <span class="sdb-icon">🛡️</span>
+            <span class="sdb-icon">T</span>
             <span class="sdb-day">Thu</span>
             <span class="sdb-target">Shoulders</span>
           </button>
           <button type="button" class="split-day-btn" data-day="Friday" role="tab" aria-selected="false">
-            <span class="sdb-icon">⚡</span>
+            <span class="sdb-icon">F</span>
             <span class="sdb-day">Fri</span>
             <span class="sdb-target">Cardio</span>
           </button>
           <button type="button" class="split-day-btn" data-day="Saturday" role="tab" aria-selected="false">
-            <span class="sdb-icon">🦵</span>
+            <span class="sdb-icon">S</span>
             <span class="sdb-day">Sat</span>
             <span class="sdb-target">Legs</span>
           </button>
           <button type="button" class="split-day-btn holiday" data-day="Sunday" role="tab" aria-selected="false">
-            <span class="sdb-icon">🧘</span>
+            <span class="sdb-icon">S</span>
             <span class="sdb-day">Sun</span>
             <span class="sdb-target">Holiday</span>
           </button>
@@ -413,28 +413,28 @@
         </div>
         <div class="coaches-grid">
           <div class="coach-card">
-            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #00F076, #0284c7);">🏋️‍♂️</div>
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #00F076, #0284c7);">MV</div>
             <h3 class="coach-card-name">Marcus Vance</h3>
             <span class="coach-card-role">Head of Strength & Conditioning</span>
             <p class="coach-card-bio">“Form first, weight second. We're here to build habits and strength that last a lifetime.”</p>
             <span class="coach-card-tag">8+ Yrs Experience • CSCS</span>
           </div>
           <div class="coach-card">
-            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #38bdf8, #818cf8);">🧘‍♀️</div>
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #38bdf8, #818cf8);">ER</div>
             <h3 class="coach-card-name">Elena Rostova</h3>
             <span class="coach-card-role">Mobility & Calisthenics</span>
             <p class="coach-card-bio">“Mobility is the bridge between lifting heavy and staying completely pain-free.”</p>
             <span class="coach-card-tag">Functional Movement Specialist</span>
           </div>
           <div class="coach-card">
-            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">⚡</div>
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">DC</div>
             <h3 class="coach-card-name">David Chen</h3>
             <span class="coach-card-role">HIIT & Athletic Conditioning</span>
             <p class="coach-card-bio">“The hardest lift of the day is getting off the couch. You're already winning.”</p>
             <span class="coach-card-tag">Kinesiology B.S. • USAW</span>
           </div>
           <div class="coach-card">
-            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #c084fc, #ec4899);">🌿</div>
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #c084fc, #ec4899);">MP</div>
             <h3 class="coach-card-name">Maya Patel</h3>
             <span class="coach-card-role">Longevity & Active Recovery</span>
             <p class="coach-card-bio">“Recovery isn't time off—it's when your muscles rebuild and you grow stronger.”</p>
@@ -467,13 +467,13 @@
           <span class="filter-label">Target:</span>
           <div class="muscle-quick-pills" id="muscle-filter-pills">
             <button type="button" class="muscle-pill-btn active" data-muscle="all">All Muscles</button>
-            <button type="button" class="muscle-pill-btn" data-muscle="Chest">💥 Chest (Mon)</button>
-            <button type="button" class="muscle-pill-btn" data-muscle="Back">🦅 Back (Tue)</button>
-            <button type="button" class="muscle-pill-btn" data-muscle="Biceps and Triceps">💪 Arms (Wed)</button>
-            <button type="button" class="muscle-pill-btn" data-muscle="Shoulders">🛡️ Shoulders (Thu)</button>
-            <button type="button" class="muscle-pill-btn" data-muscle="Cardio">⚡ Cardio (Fri)</button>
-            <button type="button" class="muscle-pill-btn" data-muscle="Legs">🦵 Legs (Sat)</button>
-            <button type="button" class="muscle-pill-btn holiday" data-muscle="Holiday">🏖️ Holiday (Sun)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Chest">Chest (Mon)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Back">Back (Tue)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Biceps and Triceps">Arms (Wed)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Shoulders">Shoulders (Thu)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Cardio">Cardio (Fri)</button>
+            <button type="button" class="muscle-pill-btn" data-muscle="Legs">Legs (Sat)</button>
+            <button type="button" class="muscle-pill-btn holiday" data-muscle="Holiday">Recovery (Sun)</button>
           </div>
         </div>
       </div>
@@ -495,11 +495,11 @@
         <div class="sunday-holiday-inner">
           <div class="sunday-holiday-media">
             <img src="/images/poster_sunday_rest.jpg" alt="Sunday Gym Holiday" class="sunday-holiday-img" id="sunday-poster-click">
-            <div class="sunday-media-badge">🧘 SUNDAY COMMUNITY RECOVERY DAY</div>
+            <div class="sunday-media-badge">SUNDAY COMMUNITY RECOVERY DAY</div>
           </div>
           <div class="sunday-holiday-content">
             <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); width: fit-content;">
-              🏖️ Community Recovery Day
+              Community Recovery Day
             </span>
             <h3 style="font-size: 1.5rem; font-weight: 800; margin: 8px 0 6px;">Time to Rest, Recharge & Recover</h3>
             <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 12px;">
@@ -510,21 +510,21 @@
             </div>
             <div class="sunday-recovery-tips">
               <div class="tip-item">
-                <span class="tip-icon">💧</span>
+                <span class="tip-icon">1</span>
                 <div>
                   <strong>Electrolyte Hydration</strong>
                   <small>Drink 3-4 liters with mineral salts</small>
                 </div>
               </div>
               <div class="tip-item">
-                <span class="tip-icon">🧘‍♂️</span>
+                <span class="tip-icon">2</span>
                 <div>
                   <strong>Foam Rolling & Mobility</strong>
                   <small>20 mins myofascial release</small>
                 </div>
               </div>
               <div class="tip-item">
-                <span class="tip-icon">🥗</span>
+                <span class="tip-icon">3</span>
                 <div>
                   <strong>Nutrient Replenishment</strong>
                   <small>High protein meal prep for Monday</small>
@@ -533,7 +533,7 @@
             </div>
             <div style="margin-top: 18px;">
               <button type="button" class="btn btn-primary btn-sm" id="btn-view-monday-chest">
-                💥 View Monday Chest Sessions
+                View Monday Chest Sessions
               </button>
             </div>
           </div>
@@ -543,7 +543,7 @@
       <!-- Empty State -->
       <div id="sessions-empty" class="empty-state" style="display: none;">
         <h3>No sessions found</h3>
-        <p>We couldn't find any sessions matching that filter! 🏋️‍♂️ Try picking 'All Sessions' or selecting tomorrow's date to see what's happening.</p>
+        <p>We couldn't find any sessions matching that filter! Try picking 'All Sessions' or selecting tomorrow's date to see what's happening.</p>
       </div>
 
       <!-- Sessions Grid -->
@@ -600,7 +600,7 @@
           <p class="page-subtitle">Create sessions, monitor attendance rosters, and check members in at the door.</p>
         </div>
         <span class="badge badge-confirmed" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border-color: rgba(168, 85, 247, 0.4);">
-          🛡️ Admin Access Active
+          Admin Access Active
         </span>
       </div>
 
@@ -631,7 +631,7 @@
       <!-- Front Desk Member Check-In -->
       <div class="checkin-box">
         <h2 style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-          <span>🚪 Front Desk Check-in</span>
+          <span>Front Desk Check-in</span>
         </h2>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
           Enter the member's 6-character access code from their digital pass to verify entry.
@@ -650,7 +650,7 @@
         <!-- Check-in Success Confirmation Card -->
         <div id="checkin-success-box" style="display: none; margin-top: 18px; padding: 16px; background: rgba(0, 240, 118, 0.1); border: 1px solid var(--accent-lime); border-radius: var(--radius-md);">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.5rem;">✅</span>
+            <span style="font-size: 1.1rem; color: var(--accent-lime); font-weight: 800; letter-spacing: 0.5px;">VERIFIED</span>
             <div>
               <h4 id="checkin-member-name" style="font-size: 1.1rem; color: var(--accent-lime);">Member Name</h4>
               <p id="checkin-member-details" style="font-size: 0.85rem; color: var(--text-secondary);">Email & Session</p>

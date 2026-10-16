@@ -45,7 +45,7 @@ const WEEKLY_SPLIT = {
     muscle: "Chest",
     badge: "Chest Day",
     tagline: "Pectoral Hypertrophy & Upper Body Power",
-    icon: "💥",
+    icon: "",
     color: "#00F076",
     poster: "/images/poster_chest.jpg",
     exercisePhoto: "/images/exercise_chest.jpg",
@@ -66,7 +66,7 @@ const WEEKLY_SPLIT = {
     muscle: "Back",
     badge: "Back Day",
     tagline: "V-Taper Lat Width, Trap Density & Spine Stability",
-    icon: "🦅",
+    icon: "",
     color: "#38bdf8",
     poster: "/images/poster_back.jpg",
     exercisePhoto: "/images/exercise_back.jpg",
@@ -87,7 +87,7 @@ const WEEKLY_SPLIT = {
     muscle: "Biceps and Triceps",
     badge: "Biceps & Triceps",
     tagline: "Arm Hypertrophy & Antagonist Super-Sets",
-    icon: "💪",
+    icon: "",
     color: "#c084fc",
     poster: "/images/poster_arms.jpg",
     exercisePhoto: "/images/exercise_arms.jpg",
@@ -108,7 +108,7 @@ const WEEKLY_SPLIT = {
     muscle: "Shoulders",
     badge: "Shoulders Day",
     tagline: "3D Deltoid Caps & Overhead Power",
-    icon: "🛡️",
+    icon: "",
     color: "#fbbf24",
     poster: "/images/poster_shoulders.jpg",
     exercisePhoto: "/images/exercise_shoulders.jpg",
@@ -129,7 +129,7 @@ const WEEKLY_SPLIT = {
     muscle: "Cardio",
     badge: "Cardio & HIIT",
     tagline: "Cardiovascular Endurance, V02 Max & Fat Oxidation",
-    icon: "⚡",
+    icon: "",
     color: "#f43f5e",
     poster: "/images/poster_cardio.jpg",
     exercisePhoto: "/images/exercise_cardio.jpg",
@@ -150,7 +150,7 @@ const WEEKLY_SPLIT = {
     muscle: "Legs",
     badge: "Legs Day",
     tagline: "Quad Sweeps, Hamstring Power & Glute Strength",
-    icon: "🦵",
+    icon: "",
     color: "#a3e635",
     poster: "/images/poster_legs.jpg",
     exercisePhoto: "/images/exercise_legs.jpg",
@@ -171,7 +171,7 @@ const WEEKLY_SPLIT = {
     muscle: "Holiday",
     badge: "Gym Holiday - Rest & Recovery",
     tagline: "Active Recovery, Central Nervous System Reset & Nutrition",
-    icon: "🧘",
+    icon: "",
     color: "#38bdf8",
     poster: "/images/poster_sunday_rest.jpg",
     exercisePhoto: "/images/exercise_sunday_rest.jpg",
@@ -269,16 +269,16 @@ function renderHumanGreeting() {
   const now = new Date();
   const hour = now.getHours();
   let timeGreeting = "Welcome";
-  let greetingIcon = "👋";
+  let greetingIcon = "";
   if (hour >= 5 && hour < 12) {
     timeGreeting = "Good morning";
-    greetingIcon = "☀️";
+    greetingIcon = "";
   } else if (hour >= 12 && hour < 17) {
     timeGreeting = "Good afternoon";
-    greetingIcon = "⚡";
+    greetingIcon = "";
   } else {
     timeGreeting = "Good evening";
-    greetingIcon = "🌙";
+    greetingIcon = "";
   }
 
   const userName = state.user ? state.user.name.split(" ")[0] : "Athlete";
@@ -299,7 +299,6 @@ function renderHumanGreeting() {
     <div class="hg-card-inner">
       <div class="hg-welcome-side">
         <div class="hg-tag">
-          <span>${greetingIcon}</span>
           <span>${timeGreeting}, ${escapeHtml(userName)}!</span>
         </div>
         <h2 class="hg-title">Ready for your training session?</h2>
@@ -307,7 +306,7 @@ function renderHumanGreeting() {
       </div>
       <div class="hg-coach-tip">
         <div class="hg-tip-header">
-          <span class="hg-coach-badge">💡 Today's Coach Tip</span>
+          <span class="hg-coach-badge">Today's Coach Tip</span>
           <span class="hg-coach-author">${dailyTip.coach}</span>
         </div>
         <p class="hg-tip-quote">${dailyTip.text}</p>
@@ -327,7 +326,7 @@ function showToast(message, type = "info", duration = 4000) {
   toast.className = `toast ${type}`;
   toast.setAttribute("role", "alert");
 
-  const icon = type === "success" ? "✓" : type === "error" ? "⚠️" : "ℹ️";
+  const icon = type === "success" ? "" : type === "error" ? "!" : "i";
   toast.innerHTML = `
     <span style="font-weight: 800; font-size: 1.1rem;">${icon}</span>
     <span style="flex: 1;">${escapeHtml(message)}</span>
@@ -863,7 +862,7 @@ function renderSessionsCards() {
     const exercisePhoto = muscleInfo.exercisePhoto || muscleInfo.exercise_photo || "";
     const badgeName = muscleInfo.badge || muscleInfo.muscle || "Gym Training";
     const badgeColor = muscleInfo.color || "#00F076";
-    const badgeIcon = muscleInfo.icon || "⚡";
+    const badgeIcon = muscleInfo.icon || "";
     const dayName = muscleInfo.day || "";
 
     // Card status classes
@@ -886,7 +885,7 @@ function renderSessionsCards() {
     } else if (isBooked) {
       actionHtml = `
         <div style="display: flex; gap: 8px; align-items: center;">
-          <span class="badge badge-confirmed">🎉 You're Booked!</span>
+          <span class="badge badge-confirmed">You're Booked</span>
           <a href="#my-bookings" class="btn btn-secondary btn-sm">View Pass</a>
         </div>
       `;
@@ -920,7 +919,7 @@ function renderSessionsCards() {
           <!-- Muscle Target Strip -->
           <div class="session-card-muscle-strip">
             <span class="muscle-badge-pill" style="background: ${badgeColor}22; color: ${badgeColor}; border: 1px solid ${badgeColor}55;">
-              ${badgeIcon} ${dayName}: ${badgeName}
+              ${dayName}: ${badgeName}
             </span>
             <button type="button" class="muscle-thumb-btn btn-open-exercise-preview"
               data-day="${dayName}"
@@ -932,36 +931,35 @@ function renderSessionsCards() {
           <div class="session-header">
             <div>
               <div class="session-time">
-                <span>⏱️</span>
                 <span>${timeFormatted}</span>
               </div>
               <div class="session-date">${formatDate(session.date)}</div>
             </div>
             <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-              ${isHappeningNow ? `<span class="badge badge-live">🔥 Active Now</span>` : ""}
+              ${isHappeningNow ? `<span class="badge badge-live">Active Now</span>` : ""}
               ${
                 isBooked
-                  ? `<span class="badge badge-confirmed">🎉 You're Booked</span>`
+                  ? `<span class="badge badge-confirmed">You're Booked</span>`
                   : isWaitlisted
                   ? `<span class="badge badge-waitlist">Standby #${session.user_waitlist_position}</span>`
                   : isFull
-                  ? `<span class="badge badge-full">🤝 20 Athletes (Full)</span>`
+                  ? `<span class="badge badge-full">20 Athletes (Full)</span>`
                   : seatsLeft <= 3
-                  ? `<span class="badge badge-waitlist">🔥 Only ${seatsLeft} Left!</span>`
-                  : `<span class="badge badge-confirmed">🟢 ${seatsLeft} Spots Open</span>`
+                  ? `<span class="badge badge-waitlist">Only ${seatsLeft} Left</span>`
+                  : `<span class="badge badge-confirmed">${seatsLeft} Spots Open</span>`
               }
             </div>
           </div>
 
           <!-- Movement Focus Tag -->
           <div style="font-size: 0.78rem; color: var(--text-secondary); margin: 6px 0 6px; display: flex; align-items: center; gap: 6px;">
-            <span>🎯</span>
+            <span>•</span>
             <span><strong>Target:</strong> ${escapeHtml(primaryExercise)}</span>
           </div>
 
           <!-- Friendly Floor Coach Badge -->
           <div class="session-coach-badge">
-            <span class="coach-avatar">👟</span>
+            <span class="coach-avatar">Coach</span>
             <div class="coach-text">
               <span class="coach-name">${escapeHtml(coach.name)} on the floor</span>
               <span class="coach-quote">“${escapeHtml(coach.quote)}”</span>
@@ -975,7 +973,7 @@ function renderSessionsCards() {
                 ${session.confirmed_count} / ${session.capacity} Athletes
               </span>
               <span style="color: var(--text-muted); font-size: 0.8rem;">
-                ${seatsLeft === 0 ? 'Standby List Open' : seatsLeft <= 3 ? `🔥 Only ${seatsLeft} left!` : `🟢 ${seatsLeft} open benches`}
+                ${seatsLeft === 0 ? 'Standby List Open' : seatsLeft <= 3 ? `Only ${seatsLeft} left` : `${seatsLeft} open benches`}
               </span>
             </div>
             <div class="capacity-track">
@@ -986,7 +984,7 @@ function renderSessionsCards() {
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
           <div style="font-size: 0.8rem; color: var(--text-muted);">
-            ${session.waitlist_count > 0 ? `<span>⏳ ${session.waitlist_count} on standby</span>` : `<span>⚡ Instant reservation</span>`}
+            ${session.waitlist_count > 0 ? `<span>${session.waitlist_count} on standby</span>` : `<span>Instant reservation</span>`}
           </div>
           <div class="session-actions" id="session-actions-${session.id}">
             ${actionHtml}
@@ -1036,7 +1034,7 @@ function attachSessionButtonListeners() {
         // Confirmation
         session.user_booking_id = response.booking.id;
         session.user_check_in_code = response.booking.check_in_code;
-        showToast("You're all set! 🎉 Door check-in pass ready in My Bookings.", "success");
+        showToast("You're all set! Door check-in pass ready in My Bookings.", "success");
         renderSessionsCards();
       } catch (err) {
         // Rollback on server refusal!
@@ -1068,7 +1066,7 @@ function attachSessionButtonListeners() {
         const data = await apiRequest(`/api/sessions/${sessionId}/waitlist`, {
           method: "POST"
         });
-        showToast(`You're #${data.waitlist.position} on standby! We'll hold your spot if anyone reschedules. 🤞`, "success");
+        showToast(`You're #${data.waitlist.position} on standby. We'll hold your spot if anyone reschedules.`, "success");
         await fetchSessions(true);
       } catch (err) {
         showToast(err.message || "Could not join standby list.", "error");
@@ -1088,7 +1086,7 @@ function attachSessionButtonListeners() {
         await apiRequest(`/api/sessions/${sessionId}/waitlist`, {
           method: "DELETE"
         });
-        showToast("Left the standby list. We hope to see you in another session! 👋", "info");
+        showToast("Left the standby list. We hope to see you in another session!", "info");
         await fetchSessions(true);
       } catch (err) {
         showToast(err.message || "Could not leave standby list.", "error");
@@ -1182,7 +1180,7 @@ function renderWeeklySplitSection(dayName = state.activeSplitDay) {
             <span class="split-poster-badge" style="border-color: ${split.color}; color: ${split.color};">
               ${split.icon} ${split.badge.toUpperCase()}
             </span>
-            <span class="split-zoom-hint">🔍 View Poster</span>
+            <span class="split-zoom-hint">View Poster</span>
           </div>
           <div class="split-poster-bottom">
             <div class="split-poster-title">${escapeHtml(split.day)}: ${escapeHtml(split.muscle)}</div>
@@ -1211,7 +1209,7 @@ function renderWeeklySplitSection(dayName = state.activeSplitDay) {
       <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
         ${(split.targetMuscles || []).map(m => `
           <span style="font-size: 0.73rem; background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); padding: 3px 8px; border-radius: var(--radius-full); color: var(--text-secondary);">
-            📍 ${escapeHtml(m)}
+            • ${escapeHtml(m)}
           </span>
         `).join("")}
       </div>
@@ -1225,7 +1223,7 @@ function renderWeeklySplitSection(dayName = state.activeSplitDay) {
             <img src="${split.exercisePhoto}" alt="${split.primaryExercise}" class="split-exercise-img">
           </div>
           <div class="split-exercise-info">
-            <h4>${split.isHoliday ? '🏖️ Active Recovery & Nutrition' : '🏋️ Form Cue & Execution'}</h4>
+            <h4>${split.isHoliday ? 'Active Recovery & Nutrition' : 'Form Cue & Execution'}</h4>
             <p>
               ${split.isHoliday 
                 ? 'Hydrate with minerals, perform full myofascial foam rolling, and fuel up with high-protein meals for the upcoming week.'
@@ -1260,17 +1258,17 @@ function renderWeeklySplitSection(dayName = state.activeSplitDay) {
       <div class="split-action-row">
         ${split.isHoliday ? `
           <span style="font-size: 0.85rem; color: var(--text-secondary);">
-            🏖️ Gym is closed on Sunday for holiday recovery.
+            Gym is closed on Sunday for holiday recovery.
           </span>
           <button type="button" class="btn btn-primary btn-sm" id="btn-quick-filter-monday">
-            💥 Book Monday Chest
+            Book Monday Chest
           </button>
         ` : `
           <button type="button" class="btn btn-primary btn-sm" id="btn-quick-filter-split">
-            🔍 Filter ${split.day} Sessions
+            Filter ${split.day} Sessions
           </button>
           <button type="button" class="btn btn-secondary btn-sm" id="btn-view-poster-modal">
-            🖼️ View Full Poster
+            View Full Poster
           </button>
         `}
       </div>
@@ -1514,7 +1512,7 @@ function renderMyConfirmedList(bookings) {
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
             ${
               isCheckedIn
-                ? `<span class="badge badge-confirmed">✓ Checked In at Door</span>`
+                ? `<span class="badge badge-confirmed">Checked In at Door</span>`
                 : isCancelled
                 ? `<span class="badge badge-full">Cancelled</span>`
                 : isLive
@@ -1591,9 +1589,9 @@ function renderMyConfirmedList(bookings) {
         });
 
         if (res.promoted_waitlist_member) {
-          showToast(`Reservation cancelled. Spot given to ${res.promoted_waitlist_member.name} on standby—thank you for freeing up your slot! 💙`, "success", 5000);
+          showToast(`Reservation cancelled. Spot given to ${res.promoted_waitlist_member.name} on standby—thank you for freeing up your slot!`, "success", 5000);
         } else {
-          showToast("Workout cancelled. We hope to see you in your next session! 💙", "info");
+          showToast("Workout cancelled. We hope to see you in your next session!", "info");
         }
 
         renderMyBookingsView();
@@ -1697,17 +1695,17 @@ function startCountdownUpdater() {
         const diffSecs = Math.floor((diffMs % (1000 * 60)) / 1000);
 
         banner.className = "countdown-banner upcoming";
-        banner.innerHTML = `⏱️ Check-in window opens in <strong>${diffHrs}h ${diffMins}m ${diffSecs}s</strong>`;
+        banner.innerHTML = `Check-in window opens in <strong>${diffHrs}h ${diffMins}m ${diffSecs}s</strong>`;
       } else if (now >= startTime && now <= endTime) {
         const leftMs = endTime - now;
         const leftMins = Math.floor(leftMs / (1000 * 60));
         const leftSecs = Math.floor((leftMs % (1000 * 60)) / 1000);
 
         banner.className = "countdown-banner open-now";
-        banner.innerHTML = `🟢 <strong>CHECK-IN OPEN NOW!</strong> Closes in ${leftMins}m ${leftSecs}s`;
+        banner.innerHTML = `<strong>CHECK-IN OPEN NOW!</strong> Closes in ${leftMins}m ${leftSecs}s`;
       } else {
         banner.className = "countdown-banner passed";
-        banner.innerHTML = `🏁 Session completed`;
+        banner.innerHTML = `Session completed`;
       }
     });
   }
@@ -1763,9 +1761,9 @@ async function openProfileModal() {
   document.getElementById("profile-modal-title").textContent = state.user.name;
   document.getElementById("profile-modal-email").textContent = state.user.email;
   document.getElementById("profile-role").textContent = state.user.role.toUpperCase();
-  document.getElementById("profile-role-badge").textContent = state.user.role === "admin" ? "🛡️ Staff Admin" : "👤 Member";
+  document.getElementById("profile-role-badge").textContent = state.user.role === "admin" ? "Staff Admin" : "Member";
   document.getElementById("profile-id").textContent = `#${state.user.id}`;
-  document.getElementById("profile-avatar").textContent = state.user.role === "admin" ? "🛡️" : "👤";
+  document.getElementById("profile-avatar").textContent = state.user.role === "admin" ? "A" : "M";
 
   try {
     const data = await apiRequest("/api/my-bookings");
@@ -1973,10 +1971,10 @@ async function loadSessionRoster(sessionId) {
                   <td>
                     ${
                       b.checked_in_at
-                        ? `<span class="badge badge-confirmed">✓ Present (${new Date(b.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})</span>`
+                        ? `<span class="badge badge-confirmed">Present (${new Date(b.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})</span>`
                         : b.status === "cancelled"
                         ? `<span class="badge badge-full">Cancelled</span>`
-                        : `<button type="button" class="btn-quick-checkin" data-code="${b.check_in_code}">⚡ Check In</button>`
+                        : `<button type="button" class="btn-quick-checkin" data-code="${b.check_in_code}">Check In</button>`
                     }
                   </td>
                 </tr>
@@ -2056,9 +2054,9 @@ function setupAdminEventListeners() {
         dateInput.parentElement.appendChild(noticeEl);
       }
       if (split.isHoliday) {
-        noticeEl.innerHTML = `<span style="color: #38bdf8; font-weight: 700;">🏖️ Note: ${split.day} is a Gym Holiday (Rest & Recovery Day).</span>`;
+        noticeEl.innerHTML = `<span style="color: #38bdf8; font-weight: 700;">Note: ${split.day} is a Gym Holiday (Rest & Recovery Day).</span>`;
       } else {
-        noticeEl.innerHTML = `<span style="color: ${split.color}; font-weight: 700;">${split.icon} Scheduled: ${split.day} - ${split.badge} (${split.muscle})</span>`;
+        noticeEl.innerHTML = `<span style="color: ${split.color}; font-weight: 700;">Scheduled: ${split.day} - ${split.badge} (${split.muscle})</span>`;
       }
     };
     dateInput.addEventListener("change", updateTargetNotice);
@@ -2093,7 +2091,7 @@ function setupAdminEventListeners() {
       });
 
       // Show confirmed details
-      document.getElementById("checkin-member-name").textContent = `✓ ${res.check_in.member.name} Marked Present!`;
+      document.getElementById("checkin-member-name").textContent = `${res.check_in.member.name} Marked Present!`;
       document.getElementById("checkin-member-details").textContent = `${res.check_in.member.email} • Session on ${res.check_in.session.date} at ${String(res.check_in.session.start_hour).padStart(2, "0")}:00`;
       successBox.style.display = "block";
 

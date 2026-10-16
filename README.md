@@ -56,7 +56,7 @@ The database comes pre-seeded with realistic member and staff accounts across mu
 | **Member** | Mike Miller | `mike@gympulse.com` | `MemberPass123!` | **Position #1 on Waitlist** for the full session |
 | **Member** | Alex Mercer | `alex@gympulse.com` | `MemberPass123!` | **Position #2 on Waitlist** for the full session |
 
-> 💡 **Quick Sign-In Bar:** The header bar provides 1-click test access to pre-configured accounts without manually retyping credentials.
+> **Quick Sign-In Bar:** The header bar provides 1-click test access to pre-configured accounts without manually retyping credentials.
 
 ---
 
