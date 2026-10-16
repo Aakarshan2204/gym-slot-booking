@@ -37,36 +37,25 @@
 </head>
 <body>
 
-  <!-- Quick Demo Persona Switcher Bar -->
-  <header class="demo-bar" id="demo-bar" aria-label="Demo Testing Controls">
+  <!-- Community Demo Persona Switcher Bar (Zero-Sound, Privacy-Enforced) -->
+  <header class="demo-bar" id="demo-bar" aria-label="Community Demo Profiles">
     <div class="demo-bar-title">
-      <span>⚡ Quick Demo Switcher:</span>
+      <span>👥 Community Preview:</span>
     </div>
     <div class="demo-personas" id="demo-personas-container">
       <button type="button" class="demo-chip admin" data-email="admin@gympulse.com" data-pass="AdminPass123!">
-        🛡️ Admin (Staff)
+        🛡️ Front Desk Staff
       </button>
       <button type="button" class="demo-chip" data-email="sarah@gympulse.com" data-pass="MemberPass123!">
-        👤 Sarah (Has Bookings)
+        👤 Sarah (Active Member)
       </button>
       <button type="button" class="demo-chip" data-email="mike@gympulse.com" data-pass="MemberPass123!">
-        ⏳ Mike (Waitlisted)
+        ⏳ Mike (Standby Queue)
       </button>
       <button type="button" class="demo-chip" data-email="alex@gympulse.com" data-pass="MemberPass123!">
         ✨ Alex (New Member)
       </button>
     </div>
-
-    <!-- Live Audio Feedback Toggle with Animated Equalizer Bars -->
-    <button type="button" class="sound-toggle-btn" id="btn-sound-toggle" title="Toggle audio feedback">
-      <span class="sound-wave">
-        <span class="sw-bar"></span>
-        <span class="sw-bar"></span>
-        <span class="sw-bar"></span>
-        <span class="sw-bar"></span>
-      </span>
-      <span id="sound-toggle-label">Sound: ON</span>
-    </button>
   </header>
 
   <!-- Main Navigation -->
@@ -78,16 +67,19 @@
 
     <ul class="nav-links" id="main-nav-links">
       <li id="nav-item-sessions">
-        <a href="#sessions" class="nav-link" id="nav-sessions">Browse Sessions</a>
+        <a href="#sessions" class="nav-link" id="nav-sessions">Training Sessions</a>
       </li>
       <li id="nav-item-split">
         <a href="#weekly-split-section" class="nav-link" id="nav-split">Weekly Split</a>
       </li>
+      <li id="nav-item-coaches">
+        <a href="#coaches-showcase" class="nav-link" id="nav-coaches">Our Coaches</a>
+      </li>
       <li id="nav-item-my-bookings" class="hidden">
-        <a href="#my-bookings" class="nav-link" id="nav-my-bookings">My Bookings</a>
+        <a href="#my-bookings" class="nav-link" id="nav-my-bookings">My Passes & Bookings</a>
       </li>
       <li id="nav-item-admin" class="hidden">
-        <a href="#admin" class="nav-link" id="nav-admin">Admin Dashboard</a>
+        <a href="#admin" class="nav-link" id="nav-admin">Staff Desk</a>
       </li>
     </ul>
 
@@ -122,10 +114,10 @@
   <div class="modal-overlay" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
     <div class="modal-content vip-ticket-modal">
       <button type="button" class="modal-close" id="qr-modal-close" aria-label="Close modal">&times;</button>
-      <div class="vip-ticket-badge">⚡ VIP ATHLETIC DOOR PASS</div>
-      <h3 id="qr-modal-title" class="vip-modal-title">Door Check-In Ticket</h3>
+      <div class="vip-ticket-badge">⚡ YOUR DIGITAL GYM PASS</div>
+      <h3 id="qr-modal-title" class="vip-modal-title">Door Check-In Pass</h3>
       <p id="qr-modal-subtitle" class="vip-modal-subtitle">
-        Scan with your smartphone camera or turnstile reader during your 1-hour session window:
+        Show this pass or QR code at the front desk when you arrive for your workout:
       </p>
       
       <!-- Optical Viewfinder with Targeting Crosshairs & Animated Laser Scan Line -->
@@ -139,9 +131,13 @@
       </div>
 
       <div class="ticket-code-showcase">
-        <span class="ticket-code-label">Unguessable Access Code</span>
+        <span class="ticket-code-label">Your Personal Check-In Code</span>
         <div class="ticket-code-large" id="qr-modal-code">------</div>
       </div>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 12px; font-style: italic; text-align: center;">
+        “Have an amazing workout today! Floor coaches are always available if you need a spot or form check.”
+      </p>
 
       <div class="modal-action-buttons">
         <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-qr-code">
@@ -283,13 +279,18 @@
     <section id="view-sessions" class="page-view" style="display: none;">
       <div class="page-header">
         <div>
-          <h1 class="page-title">Gym Sessions</h1>
-          <p class="page-subtitle">1-hour training blocks with strict 20-person capacity. Real-time availability.</p>
+          <h1 class="page-title">Today's Community Training Schedule</h1>
+          <p class="page-subtitle">Pick your 1-hour block, reserve your spot, and come train with plenty of space to breathe.</p>
         </div>
         <div class="live-pulse" title="Live background sync active every 4 seconds">
           <span class="pulse-dot"></span>
-          <span>Live Availability Sync</span>
+          <span>Live Floor Availability</span>
         </div>
+      </div>
+
+      <!-- Humanized Community Greeting & Daily Coach Tip Banner -->
+      <div id="human-greeting-banner" class="human-greeting-card">
+        <!-- Injected via JavaScript renderHumanGreeting() -->
       </div>
 
       <!-- High-Impact Athletic Hero Banner -->
@@ -297,39 +298,39 @@
         <div class="hero-content">
           <div class="hero-tag">
             <span class="pulse-dot"></span>
-            <span>HIGH-INTENSITY TRAINING & SMART ACCESS</span>
+            <span>🤝 THE GYM WHERE EVERY ATHLETE HAS ROOM TO GROW</span>
           </div>
-          <h1 class="hero-title">Atomic Booking. <span class="gradient-text">Zero Overbooking.</span></h1>
+          <h1 class="hero-title">Train In Peace. <span class="gradient-text">Never Overcrowded.</span></h1>
           <p class="hero-subtitle">
-            Book 1-hour sessions with mathematically guaranteed 20-person capacity locks, automated FIFO waitlist standby promotion, and cryptographically secure door check-in QR passes.
+            Say goodbye to fighting for squat racks or waiting for dumbbells. We cap every 1-hour session to 20 athletes so you can focus on proper form, make steady progress, and train alongside a supportive, motivating community.
           </p>
           <div class="hero-stats-row">
             <div class="hero-stat-pill">
-              <span class="stat-pill-icon">🛡️</span>
+              <span class="stat-pill-icon">🏋️‍♂️</span>
               <div>
-                <strong>Strict 20-Seat Cap</strong>
-                <small>ACID write-locked</small>
+                <strong>Spacious 20-Cap</strong>
+                <small>Always an open bench & rack</small>
               </div>
             </div>
             <div class="hero-stat-pill">
-              <span class="stat-pill-icon">⚡</span>
+              <span class="stat-pill-icon">🤝</span>
               <div>
-                <strong>Auto Waitlist</strong>
-                <small>Instant standby promotion</small>
+                <strong>Floor Coach Support</strong>
+                <small>Form checks & encouragement</small>
+              </div>
+            </div>
+            <div class="hero-stat-pill">
+              <span class="stat-pill-icon">⏳</span>
+              <div>
+                <strong>Fair Standby Queue</strong>
+                <small>Life happens—we hold your spot</small>
               </div>
             </div>
             <div class="hero-stat-pill">
               <span class="stat-pill-icon">📱</span>
               <div>
-                <strong>Real ISO/IEC QR</strong>
-                <small>Phone camera scannable</small>
-              </div>
-            </div>
-            <div class="hero-stat-pill">
-              <span class="stat-pill-icon">🚪</span>
-              <div>
-                <strong>1-Hr Time Gate</strong>
-                <small>Door window security</small>
+                <strong>One-Tap Phone Pass</strong>
+                <small>Contactless front-desk check-in</small>
               </div>
             </div>
           </div>
@@ -402,6 +403,52 @@
         </div>
       </section>
 
+      <!-- ==========================================
+           MEET OUR COACHES & COMMUNITY SECTION
+           ========================================== -->
+      <section class="coaches-section" id="coaches-showcase" aria-label="Our Dedicated Coaching Team">
+        <div class="coaches-header">
+          <div class="split-tag">
+            <span class="pulse-dot"></span>
+            <span>MEET YOUR GYM FAMILY</span>
+          </div>
+          <h2 class="split-section-title">Certified Coaches On The Floor Every Hour</h2>
+          <p class="split-section-subtitle">
+            No intimidation, no robotic machines. Our coaches are right there on the floor to check your form, share a spot, and help you train injury-free.
+          </p>
+        </div>
+        <div class="coaches-grid">
+          <div class="coach-card">
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #00F076, #0284c7);">🏋️‍♂️</div>
+            <h3 class="coach-card-name">Marcus Vance</h3>
+            <span class="coach-card-role">Head of Strength & Conditioning</span>
+            <p class="coach-card-bio">“Form first, weight second. We're here to build habits and strength that last a lifetime.”</p>
+            <span class="coach-card-tag">8+ Yrs Experience • CSCS</span>
+          </div>
+          <div class="coach-card">
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #38bdf8, #818cf8);">🧘‍♀️</div>
+            <h3 class="coach-card-name">Elena Rostova</h3>
+            <span class="coach-card-role">Mobility & Calisthenics</span>
+            <p class="coach-card-bio">“Mobility is the bridge between lifting heavy and staying completely pain-free.”</p>
+            <span class="coach-card-tag">Functional Movement Specialist</span>
+          </div>
+          <div class="coach-card">
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">⚡</div>
+            <h3 class="coach-card-name">David Chen</h3>
+            <span class="coach-card-role">HIIT & Athletic Conditioning</span>
+            <p class="coach-card-bio">“The hardest lift of the day is getting off the couch. You're already winning.”</p>
+            <span class="coach-card-tag">Kinesiology B.S. • USAW</span>
+          </div>
+          <div class="coach-card">
+            <div class="coach-card-avatar" style="background: linear-gradient(135deg, #c084fc, #ec4899);">🌿</div>
+            <h3 class="coach-card-name">Maya Patel</h3>
+            <span class="coach-card-role">Longevity & Active Recovery</span>
+            <p class="coach-card-bio">“Recovery isn't time off—it's when your muscles rebuild and you grow stronger.”</p>
+            <span class="coach-card-tag">Physical Therapy & Yoga RYT-500</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-group">
@@ -416,8 +463,8 @@
           <label for="filter-status" class="filter-label">Status:</label>
           <select id="filter-status" class="form-select" style="width: auto; min-width: 130px;">
             <option value="all">All Sessions</option>
-            <option value="available">Available Spots</option>
-            <option value="full">Full (Waitlist Open)</option>
+            <option value="available">Open Spots (Spacious)</option>
+            <option value="full">Full (Standby Open)</option>
           </select>
         </div>
 
@@ -454,16 +501,19 @@
         <div class="sunday-holiday-inner">
           <div class="sunday-holiday-media">
             <img src="/images/poster_sunday_rest.jpg" alt="Sunday Gym Holiday" class="sunday-holiday-img" id="sunday-poster-click">
-            <div class="sunday-media-badge">🧘 SUNDAY REST & RECOVERY</div>
+            <div class="sunday-media-badge">🧘 SUNDAY COMMUNITY RECOVERY DAY</div>
           </div>
           <div class="sunday-holiday-content">
             <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); width: fit-content;">
-              🏖️ Official Gym Holiday
+              🏖️ Community Recovery Day
             </span>
-            <h3 style="font-size: 1.5rem; font-weight: 800; margin: 8px 0 6px;">Facility Closed for Deep Recovery</h3>
-            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 16px;">
-              PULSE Gym observes a weekly rest holiday every Sunday to prioritize central nervous system restoration, joint longevity, and facility deep sanitization. Regular training sessions resume Monday with <strong>Chest Day</strong>!
+            <h3 style="font-size: 1.5rem; font-weight: 800; margin: 8px 0 6px;">Time to Rest, Recharge & Recover</h3>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 12px;">
+              Rest days are just as important as lifting days. Every Sunday our coaching team hosts an open recovery & mobility workshop while the main floor undergoes thorough sanitization so you can kick off Monday feeling 100% refreshed!
             </p>
+            <div style="margin-bottom: 16px; font-style: italic; color: #38bdf8; font-size: 0.88rem;">
+              “Listen to your body today—hydrate, stretch, and get good sleep tonight!” — Coach Maya
+            </div>
             <div class="sunday-recovery-tips">
               <div class="tip-item">
                 <span class="tip-icon">💧</span>
@@ -499,7 +549,7 @@
       <!-- Empty State -->
       <div id="sessions-empty" class="empty-state" style="display: none;">
         <h3>No sessions found</h3>
-        <p>There are no sessions scheduled for this filter. Check another date or ask staff to create one.</p>
+        <p>We couldn't find any sessions matching that filter! 🏋️‍♂️ Try picking 'All Sessions' or selecting tomorrow's date to see what's happening.</p>
       </div>
 
       <!-- Sessions Grid -->
@@ -512,8 +562,8 @@
     <section id="view-my-bookings" class="page-view" style="display: none;">
       <div class="page-header">
         <div>
-          <h1 class="page-title">My Bookings & Waitlists</h1>
-          <p class="page-subtitle">View your access codes, door check-in countdowns, and automated waitlist queues.</p>
+          <h1 class="page-title">My Training Passes & Standby Spots</h1>
+          <p class="page-subtitle">Everything you need for your upcoming workouts—door access codes, countdowns, and real-time standby updates.</p>
         </div>
         <a href="#sessions" class="btn btn-primary btn-sm">+ Book Another Session</a>
       </div>
@@ -537,9 +587,9 @@
 
         <!-- Waitlist Section -->
         <div style="margin-top: 36px;">
-          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Waitlist Standby</h2>
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Your Standby Spots</h2>
           <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">
-            If someone cancels before the session begins, you are automatically booked and assigned an unguessable check-in code.
+            Whenever a member reschedules, our system automatically moves you into the session and prepares your door code. We've got your back!
           </p>
           <div id="my-waitlist-list"></div>
         </div>

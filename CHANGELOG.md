@@ -4,6 +4,33 @@ All notable changes to the **PULSE GYM** Slot Booking & Door Check-In System wil
 
 The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`v<MAJOR>.<MINOR>.<PATCH>`).
 
+## [v1.2.5] - 2026-10-16
+
+### 🚀 Summary of Improvements Over v1.2.4
+Version 1.2.5 fulfills the user request to **completely remove the audio/sound option** and **transform the website into a warm, deeply human, community-centric athletic experience**. Synthetic audio synthesizer sound effects, audio toggle buttons, and equalizer animations have been eliminated for a clean, peaceful browsing experience. In their place, GymPulse now features a personalized **Time-of-Day Community Greeting Banner** with daily coach advice, a dedicated **"Meet Your Gym Family" Coaches Showcase** highlighting certified floor trainers, **Hourly Floor Coach Badges** on every session card with motivating form tips, and empathetic, supportive copywriting across hero banners, standby queues, empty states, and cancellation flows.
+
+### 🔍 Side-by-Side Comparison: What Improved from v1.2.4 to v1.2.5?
+
+| Area / Feature | In v1.2.4 | In v1.2.5 (Improved) | Real-World Impact |
+| :--- | :--- | :--- | :--- |
+| **Audio / Sound Option** | Header featured a `Sound: ON/OFF` equalizer toggle button and Web Audio synthesizer beeps/chimes on clicks, bookings, and errors. | **Completely Removed**: Sound toggle button, equalizer CSS animations, and synthetic beep sounds are 100% eliminated. Silent, unobtrusive modern web experience. | No unexpected noises or artificial sound effects when browsing or reserving workouts. |
+| **Personalized Welcome Experience** | Static page header with clinical title *"Gym Sessions"* and technical tagline *"1-hour training blocks with strict 20-person capacity"*. | **Dynamic Time-of-Day Greeting Banner**: Personalized card greets members by name (*"Good morning, Sarah! ☀️"*, *"Good afternoon!"*, *"Good evening!"*) with a daily rotating coach tip. | Welcoming, human, and encouraging atmosphere every time a member opens the site. |
+| **Coaching Staff & Mentorship** | No visible coaches or human presence; sessions appeared purely as automated system time slots. | **"Meet Your Gym Family" Showcase & Floor Coaches**: Introduces 4 certified trainers (Marcus Vance, Elena Rostova, David Chen, Maya Patel) with bios, credentials, and floor assignments. | Makes members feel supported and guided by real human trainers rather than an algorithm. |
+| **Session Cards & Floor Presence** | Showed only time, target muscle, and capacity numbers with cold labels (*"Book Seat"*, *"Waitlist"*). | **Friendly Floor Coach Badges & Human Microcopy**: Each session showcases the floor coach on duty (e.g. *Coach Marcus on floor • “Early bird crew! Warm up those shoulders”*) and buttons like *"Reserve My Spot"* and *"🎉 You're Booked!"*. | Sessions feel personal, inviting, and safe for beginners and seasoned lifters alike. |
+| **Hero Section Copywriting** | Robotic whitepaper jargon: *"Atomic Booking. Zero Overbooking. Mathematically guaranteed 20-person capacity locks, ACID write-locked"*. | **Human-Centered Athletic Mission**: *"Train In Peace. Never Overcrowded."* highlighting spacious 20-cap benches, floor coach support, fair standby queue, and one-tap contactless phone passes. | Connects with members on emotional fitness goals rather than database mechanics. |
+| **Cancellation & Standby Empathy** | Technical browser alert: *"Are you sure you want to cancel this booking? The first waitlisted member will be automatically booked in your place."* | **Empathetic & Supportive Reassurance**: *"Cancel your workout reservation? No worries at all—life happens! We'll pass your spot to a fellow member waiting on standby."* with grateful toast confirmations. | Removes guilt from cancelling when sick or busy and rewards community sportsmanship. |
+| **Pass Modal & Ticket Header** | Clinical security labeling: *"VIP ATHLETIC DOOR PASS"*, *"Unguessable Access Code"*. | **Encouraging Pass Card**: *"⚡ YOUR DIGITAL GYM PASS"*, *"Your Personal Check-In Code"*, and coach advice: *“Have an amazing workout today! Floor coaches are always available if you need a spot or form check.”* | Feels like a VIP member card at a friendly neighborhood club. |
+
+### 🛠️ Technical Details & Commits
+- **Audio Removal (`index.html`, `style.css`, `app.js`)**: Removed `#btn-sound-toggle` button, `.sound-toggle-btn` styles, and replaced `SoundEffects` class with a silent no-op stub.
+- **Greeting Banner (`app.js`, `style.css`, `index.html`)**: Added `#human-greeting-banner` dynamic container, `renderHumanGreeting()` helper, time-of-day clock evaluation, and rotating daily coach tips.
+- **Coaches Showcase (`index.html`, `style.css`)**: Built `#coaches-showcase` grid presenting certified trainers with credentials, quotes, and specialized disciplines.
+- **Hourly Floor Coaches (`app.js`)**: Implemented `COACHES_BY_HOUR` map and `getCoachForHour()` helper rendering coach badges on all training sessions.
+- **Humanized Navigation (`index.html`, `app.js`)**: Added smooth scroll link for *"Our Coaches"* and updated tab labels to *"Training Sessions"*, *"My Passes & Bookings"*, and *"Staff Desk"*.
+- **Empathetic Dialogs & Toasts (`app.js`)**: Revised confirmation prompts, booking notifications, and standby feedback to be encouraging and supportive.
+
+---
+
 ## [v1.2.4] - 2026-10-16
 
 ### 🚀 Summary of Improvements Over v1.2.3

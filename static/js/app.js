@@ -226,130 +226,102 @@ const state = {
 };
 
 // ============================================================================
-// Web Audio Synthesizer (Zero-asset audio feedback)
+// Zero-Audio Quiet Mode (Sound option removed per user preference)
 // ============================================================================
-class SoundEffects {
-  constructor() {
-    this.ctx = null;
-    this.enabled = localStorage.getItem("pulse_sound") !== "false";
-  }
+const sounds = {
+  playClick() {},
+  playSuccess() {},
+  playError() {},
+  updateUI() {},
+  toggle() { return false; }
+};
 
-  toggle() {
-    this.enabled = !this.enabled;
-    localStorage.setItem("pulse_sound", this.enabled ? "true" : "false");
-    this.updateUI();
-    return this.enabled;
-  }
+// ============================================================================
+// Coaching Staff & Hourly Floor Guidance
+// ============================================================================
+const COACHES_BY_HOUR = {
+  6: { name: "Coach Marcus", quote: "Early morning lifters! Let's get that body warmed up." },
+  7: { name: "Coach Marcus", quote: "Great morning for steady, focused reps." },
+  8: { name: "Coach Elena", quote: "Focus on controlled breathing and spine alignment." },
+  9: { name: "Coach Elena", quote: "Quality form over heavy weight every time." },
+  10: { name: "Coach David", quote: "High energy morning! Keep your intensity consistent." },
+  11: { name: "Coach David", quote: "Push through the burn—you've got this." },
+  12: { name: "Coach Marcus", quote: "Midday power block! Make every set count." },
+  13: { name: "Coach Maya", quote: "Steady pace, deep mind-muscle connection." },
+  14: { name: "Coach Maya", quote: "Focus on full range of motion today." },
+  15: { name: "Coach David", quote: "Afternoon recharge—leave your stress on the mats." },
+  16: { name: "Coach Elena", quote: "Listen to your body on every single rep." },
+  17: { name: "Coach Marcus", quote: "Evening rush! Let's chase those personal bests." },
+  18: { name: "Coach Marcus", quote: "Great to see you here tonight. Let's work!" },
+  19: { name: "Coach David", quote: "High energy, high fives all around!" },
+  20: { name: "Coach Elena", quote: "Finish strong, and don't skip your cooldown." },
+  21: { name: "Coach Maya", quote: "Night crew! Train with focus and intention." },
+  22: { name: "Coach Maya", quote: "Late workout done right—sleep well tonight!" }
+};
 
-  updateUI() {
-    const btn = document.getElementById("btn-sound-toggle");
-    const label = document.getElementById("sound-toggle-label");
-    if (btn && label) {
-      if (this.enabled) {
-        btn.classList.remove("muted");
-        label.textContent = "Sound: ON";
-      } else {
-        btn.classList.add("muted");
-        label.textContent = "Sound: OFF";
-      }
-    }
-  }
-
-  init() {
-    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
-    }
-  }
-
-  playClick() {
-    if (!this.enabled) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === "suspended") this.ctx.resume();
-
-      const now = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(600, now);
-      osc.frequency.exponentialRampToValueAtTime(1000, now + 0.06);
-
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.08);
-    } catch (_) {}
-  }
-
-  playSuccess() {
-    if (!this.enabled) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === "suspended") this.ctx.resume();
-
-      const now = this.ctx.currentTime;
-      // High harmonic dual chime
-      const osc1 = this.ctx.createOscillator();
-      const osc2 = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc1.type = "sine";
-      osc2.type = "sine";
-      osc1.frequency.setValueAtTime(587.33, now); // D5
-      osc1.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
-
-      osc2.frequency.setValueAtTime(880, now + 0.15);
-      osc2.frequency.exponentialRampToValueAtTime(1174.66, now + 0.35); // D6
-
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-
-      osc1.connect(gain);
-      osc2.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc1.start(now);
-      osc2.start(now + 0.15);
-      osc1.stop(now + 0.15);
-      osc2.stop(now + 0.45);
-    } catch (_) {}
-  }
-
-  playError() {
-    if (!this.enabled) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === "suspended") this.ctx.resume();
-
-      const now = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.setValueAtTime(180, now + 0.1);
-
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.25);
-    } catch (_) {}
-  }
+function getCoachForHour(hour) {
+  return COACHES_BY_HOUR[hour] || {
+    name: "Coach Marcus",
+    quote: "Train smart, stay hydrated, and enjoy your workout!"
+  };
 }
-const sounds = new SoundEffects();
+
+// ============================================================================
+// Dynamic Human Greeting & Daily Inspiration Renderer
+// ============================================================================
+function renderHumanGreeting() {
+  const container = document.getElementById("human-greeting-banner");
+  if (!container) return;
+
+  const now = new Date();
+  const hour = now.getHours();
+  let timeGreeting = "Welcome";
+  let greetingIcon = "👋";
+  if (hour >= 5 && hour < 12) {
+    timeGreeting = "Good morning";
+    greetingIcon = "☀️";
+  } else if (hour >= 12 && hour < 17) {
+    timeGreeting = "Good afternoon";
+    greetingIcon = "⚡";
+  } else {
+    timeGreeting = "Good evening";
+    greetingIcon = "🌙";
+  }
+
+  const userName = state.user ? state.user.name.split(" ")[0] : "Athlete";
+  const userSubtext = state.user
+    ? `Great to have you with us today, ${escapeHtml(userName)}! Ready to make real progress?`
+    : `Welcome to Pulse Gym! Explore today's uncrowded sessions below and join our fitness family.`;
+
+  const tips = [
+    { coach: "Coach Marcus", text: "“Consistency beats intensity. Show up, respect the weights, and enjoy every rep.”" },
+    { coach: "Coach Elena", text: "“Never skip your dynamic warmup. 5 minutes of mobility saves months of joint aches.”" },
+    { coach: "Coach David", text: "“The hardest part is lacing up your shoes and getting through the front door. You're already winning.”" },
+    { coach: "Coach Maya", text: "“Hydrate before you feel thirsty! Sip water between sets to keep strength high.”" }
+  ];
+  const dayIndex = now.getDay() % tips.length;
+  const dailyTip = tips[dayIndex];
+
+  container.innerHTML = `
+    <div class="hg-card-inner">
+      <div class="hg-welcome-side">
+        <div class="hg-tag">
+          <span>${greetingIcon}</span>
+          <span>${timeGreeting}, ${escapeHtml(userName)}!</span>
+        </div>
+        <h2 class="hg-title">Ready for your training session?</h2>
+        <p class="hg-sub">${userSubtext}</p>
+      </div>
+      <div class="hg-coach-tip">
+        <div class="hg-tip-header">
+          <span class="hg-coach-badge">💡 Today's Coach Tip</span>
+          <span class="hg-coach-author">${dailyTip.coach}</span>
+        </div>
+        <p class="hg-tip-quote">${dailyTip.text}</p>
+      </div>
+    </div>
+  `;
+}
 
 // ============================================================================
 // Toast Notification System
@@ -768,6 +740,7 @@ async function renderSessionsView() {
   const view = document.getElementById("view-sessions");
   view.style.display = "block";
 
+  renderHumanGreeting();
   await fetchSessions(false);
   startPolling();
 }
@@ -910,37 +883,39 @@ function renderSessionsCards() {
       isFull ? "full-session" : ""
     ].filter(Boolean).join(" ");
 
+    const coach = getCoachForHour(session.start_hour);
+
     // Action button logic
     let actionHtml = "";
     if (hasEnded) {
-      actionHtml = `<button class="btn btn-secondary btn-sm" disabled>Session Ended</button>`;
+      actionHtml = `<button class="btn btn-secondary btn-sm" disabled>Session Completed</button>`;
     } else if (hasStarted) {
-      actionHtml = `<button class="btn btn-secondary btn-sm" disabled>In Progress</button>`;
+      actionHtml = `<button class="btn btn-secondary btn-sm" disabled>In Progress Now</button>`;
     } else if (isBooked) {
       actionHtml = `
         <div style="display: flex; gap: 8px; align-items: center;">
-          <span class="badge badge-confirmed">✓ Booked</span>
-          <a href="#my-bookings" class="btn btn-secondary btn-sm">View Ticket</a>
+          <span class="badge badge-confirmed">🎉 You're Booked!</span>
+          <a href="#my-bookings" class="btn btn-secondary btn-sm">View Pass</a>
         </div>
       `;
     } else if (isWaitlisted) {
       actionHtml = `
         <div style="display: flex; gap: 8px; align-items: center;">
-          <span class="badge badge-waitlist">Waitlist #${session.user_waitlist_position || 1}</span>
+          <span class="badge badge-waitlist">Standby #${session.user_waitlist_position || 1}</span>
           <button class="btn btn-danger btn-sm btn-leave-waitlist" data-session-id="${session.id}">Leave</button>
         </div>
       `;
     } else if (isFull) {
       actionHtml = `
         <button class="btn btn-secondary btn-sm btn-join-waitlist" data-session-id="${session.id}">
-          Join Waitlist (${session.waitlist_count} waiting)
+          Join Standby (${session.waitlist_count} waiting)
         </button>
       `;
     } else {
       // Free seats available
       actionHtml = `
         <button class="btn btn-primary btn-sm btn-book" data-session-id="${session.id}" data-seats="${seatsLeft}">
-          Book Seat (${seatsLeft} free)
+          Reserve My Spot (${seatsLeft} open)
         </button>
       `;
     }
@@ -974,30 +949,41 @@ function renderSessionsCards() {
               ${isHappeningNow ? `<span class="badge badge-live">🔥 Active Now</span>` : ""}
               ${
                 isBooked
-                  ? `<span class="badge badge-confirmed">Booked</span>`
+                  ? `<span class="badge badge-confirmed">🎉 You're Booked</span>`
                   : isWaitlisted
-                  ? `<span class="badge badge-waitlist">Waitlist #${session.user_waitlist_position}</span>`
+                  ? `<span class="badge badge-waitlist">Standby #${session.user_waitlist_position}</span>`
                   : isFull
-                  ? `<span class="badge badge-full">Sold Out</span>`
-                  : `<span class="badge badge-confirmed">${seatsLeft} Seats Open</span>`
+                  ? `<span class="badge badge-full">🤝 20 Athletes (Full)</span>`
+                  : seatsLeft <= 3
+                  ? `<span class="badge badge-waitlist">🔥 Only ${seatsLeft} Left!</span>`
+                  : `<span class="badge badge-confirmed">🟢 ${seatsLeft} Spots Open</span>`
               }
             </div>
           </div>
 
           <!-- Movement Focus Tag -->
-          <div style="font-size: 0.78rem; color: var(--text-secondary); margin: 6px 0 10px; display: flex; align-items: center; gap: 6px;">
+          <div style="font-size: 0.78rem; color: var(--text-secondary); margin: 6px 0 6px; display: flex; align-items: center; gap: 6px;">
             <span>🎯</span>
             <span><strong>Target:</strong> ${escapeHtml(primaryExercise)}</span>
+          </div>
+
+          <!-- Friendly Floor Coach Badge -->
+          <div class="session-coach-badge">
+            <span class="coach-avatar">👟</span>
+            <div class="coach-text">
+              <span class="coach-name">${escapeHtml(coach.name)} on the floor</span>
+              <span class="coach-quote">“${escapeHtml(coach.quote)}”</span>
+            </div>
           </div>
 
           <!-- Capacity Meter -->
           <div class="capacity-box">
             <div class="capacity-info">
               <span class="seats-count ${seatsLeft === 0 ? 'zero' : seatsLeft <= 3 ? 'low' : ''}">
-                ${session.confirmed_count} / ${session.capacity} Booked
+                ${session.confirmed_count} / ${session.capacity} Athletes
               </span>
               <span style="color: var(--text-muted); font-size: 0.8rem;">
-                ${seatsLeft === 0 ? 'Waitlist Open' : `${seatsLeft} available`}
+                ${seatsLeft === 0 ? 'Standby List Open' : seatsLeft <= 3 ? `🔥 Only ${seatsLeft} left!` : `🟢 ${seatsLeft} open benches`}
               </span>
             </div>
             <div class="capacity-track">
@@ -1008,7 +994,7 @@ function renderSessionsCards() {
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
           <div style="font-size: 0.8rem; color: var(--text-muted);">
-            ${session.waitlist_count > 0 ? `<span>⏳ ${session.waitlist_count} on waitlist</span>` : `<span>⚡ Instant confirmation</span>`}
+            ${session.waitlist_count > 0 ? `<span>⏳ ${session.waitlist_count} on standby</span>` : `<span>⚡ Instant reservation</span>`}
           </div>
           <div class="session-actions" id="session-actions-${session.id}">
             ${actionHtml}
@@ -1026,8 +1012,7 @@ function attachSessionButtonListeners() {
   document.querySelectorAll(".btn-book").forEach(btn => {
     btn.addEventListener("click", async () => {
       if (!state.token) {
-        if (typeof sounds !== "undefined") sounds.playClick();
-        showToast("Please log in or select a demo account to reserve a session.", "info", 4000);
+        showToast("Please log in or pick a demo profile to reserve your workout.", "info", 4000);
         navigateTo("#login");
         return;
       }
@@ -1036,8 +1021,6 @@ function attachSessionButtonListeners() {
       const session = state.sessions.find(s => s.id === sessionId);
       if (!session) return;
 
-      // Optimistic UI Update:
-      // "Booking feels instant: the seat count updates straight away and rolls back if the server refuses."
       const prevSeats = session.seats_remaining;
       const prevConfirmed = session.confirmed_count;
       const prevIsBooked = session.is_booked_by_user;
@@ -1051,7 +1034,7 @@ function attachSessionButtonListeners() {
       // Re-render UI immediately
       renderSessionsCards();
 
-      showToast("Reserving your seat...", "info", 1500);
+      showToast("Saving your workout spot...", "info", 1500);
 
       try {
         const response = await apiRequest(`/api/sessions/${sessionId}/book`, {
@@ -1061,7 +1044,7 @@ function attachSessionButtonListeners() {
         // Confirmation
         session.user_booking_id = response.booking.id;
         session.user_check_in_code = response.booking.check_in_code;
-        showToast("Seat confirmed! Check-in code generated.", "success");
+        showToast("You're all set! 🎉 Door check-in pass ready in My Bookings.", "success");
         renderSessionsCards();
       } catch (err) {
         // Rollback on server refusal!
@@ -1071,7 +1054,7 @@ function attachSessionButtonListeners() {
         session.is_full = prevSeats <= 0;
         renderSessionsCards();
 
-        showToast(err.message || "Booking failed. Reverting seats.", "error", 5000);
+        showToast(err.message || "Could not reserve spot. Please try again.", "error", 5000);
       }
     });
   });
@@ -1080,26 +1063,25 @@ function attachSessionButtonListeners() {
   document.querySelectorAll(".btn-join-waitlist").forEach(btn => {
     btn.addEventListener("click", async () => {
       if (!state.token) {
-        if (typeof sounds !== "undefined") sounds.playClick();
-        showToast("Please log in or select a demo account to join the waitlist.", "info", 4000);
+        showToast("Please log in or pick a demo profile to join the standby list.", "info", 4000);
         navigateTo("#login");
         return;
       }
 
       const sessionId = parseInt(btn.getAttribute("data-session-id"), 10);
       btn.disabled = true;
-      btn.textContent = "Joining...";
+      btn.textContent = "Joining standby...";
 
       try {
         const data = await apiRequest(`/api/sessions/${sessionId}/waitlist`, {
           method: "POST"
         });
-        showToast(`Added to waitlist! Position: #${data.waitlist.position}`, "success");
+        showToast(`You're #${data.waitlist.position} on standby! We'll hold your spot if anyone reschedules. 🤞`, "success");
         await fetchSessions(true);
       } catch (err) {
-        showToast(err.message || "Could not join waitlist.", "error");
+        showToast(err.message || "Could not join standby list.", "error");
         btn.disabled = false;
-        btn.textContent = "Join Waitlist";
+        btn.textContent = "Join Standby";
       }
     });
   });
@@ -1114,10 +1096,10 @@ function attachSessionButtonListeners() {
         await apiRequest(`/api/sessions/${sessionId}/waitlist`, {
           method: "DELETE"
         });
-        showToast("You have left the waitlist.", "info");
+        showToast("Left the standby list. We hope to see you in another session! 👋", "info");
         await fetchSessions(true);
       } catch (err) {
-        showToast(err.message || "Could not leave waitlist.", "error");
+        showToast(err.message || "Could not leave standby list.", "error");
         btn.disabled = false;
       }
     });
@@ -1604,7 +1586,7 @@ function renderMyConfirmedList(bookings) {
   document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
     btn.addEventListener("click", async () => {
       const bookingId = btn.getAttribute("data-booking-id");
-      if (!confirm("Are you sure you want to cancel this booking? The first waitlisted member will be automatically booked in your place.")) {
+      if (!confirm("Cancel your workout reservation? No worries at all—life happens! We'll pass your spot to a fellow member waiting on standby.")) {
         return;
       }
 
@@ -1617,9 +1599,9 @@ function renderMyConfirmedList(bookings) {
         });
 
         if (res.promoted_waitlist_member) {
-          showToast(`Booking cancelled. Waitlisted member ${res.promoted_waitlist_member.name} was automatically promoted!`, "success", 5000);
+          showToast(`Reservation cancelled. Spot given to ${res.promoted_waitlist_member.name} on standby—thank you for freeing up your slot! 💙`, "success", 5000);
         } else {
-          showToast("Booking cancelled successfully.", "info");
+          showToast("Workout cancelled. We hope to see you in your next session! 💙", "info");
         }
 
         renderMyBookingsView();
@@ -2205,7 +2187,6 @@ function formatDate(dateStr) {
 // Application Bootstrap
 // ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  sounds.updateUI();
   updateNavUserUI();
   setupAuthEventListeners();
   setupSessionsFilterListeners();
@@ -2225,10 +2206,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 120);
   });
 
-  // Sound toggle listener
-  document.getElementById("btn-sound-toggle")?.addEventListener("click", () => {
-    sounds.toggle();
-    sounds.playClick();
+  // Meet Our Coaches Nav link scroll
+  document.getElementById("nav-coaches")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (window.location.hash !== "#sessions") {
+      navigateTo("#sessions");
+    }
+    setTimeout(() => {
+      document.getElementById("coaches-showcase")?.scrollIntoView({ behavior: "smooth" });
+    }, 120);
   });
 
   // QR Modal close listener

@@ -183,56 +183,226 @@ h1, h2, h3, h4, .page-title, .hero-title {
   background: rgba(168, 85, 247, 0.2);
 }
 
-/* Sound Toggle Chip with Equalizer Animation */
-.sound-toggle-btn {
-  background: rgba(0, 240, 118, 0.1);
-  border: 1px solid rgba(0, 240, 118, 0.3);
-  color: var(--accent-lime);
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+/* ============================================================================
+   Humanized Community Greeting & Daily Coach Tip Banner
+   ============================================================================ */
+.human-greeting-card {
+  background: linear-gradient(135deg, rgba(20, 27, 45, 0.95), rgba(12, 17, 29, 0.95));
+  border: 1px solid rgba(0, 240, 118, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.human-greeting-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent-lime), var(--accent-cyan));
+}
+
+.hg-card-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.hg-welcome-side {
+  flex: 1 1 340px;
+}
+
+.hg-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-left: auto;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-lime);
+  background: rgba(0, 240, 118, 0.1);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+  border: 1px solid rgba(0, 240, 118, 0.2);
 }
-.sound-toggle-btn:hover {
-  background: rgba(0, 240, 118, 0.2);
-  box-shadow: 0 0 12px var(--accent-lime-glow);
+
+.hg-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.3px;
 }
-.sound-toggle-btn.muted {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border-subtle);
+
+.hg-sub {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.hg-coach-tip {
+  flex: 0 1 360px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+
+.hg-tip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.hg-coach-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hg-coach-author {
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--text-muted);
 }
-.sound-wave {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-}
-.sw-bar {
-  width: 2px;
-  background: currentColor;
-  border-radius: 1px;
-  animation: bounceWave 0.7s ease-in-out infinite alternate;
-}
-.sw-bar:nth-child(1) { height: 4px; animation-delay: 0.1s; }
-.sw-bar:nth-child(2) { height: 11px; animation-delay: 0.3s; }
-.sw-bar:nth-child(3) { height: 7px; animation-delay: 0.2s; }
-.sw-bar:nth-child(4) { height: 12px; animation-delay: 0.4s; }
 
-.sound-toggle-btn.muted .sw-bar {
-  animation: none !important;
-  height: 3px !important;
+.hg-tip-quote {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
 }
 
-@keyframes bounceWave {
-  0% { height: 3px; }
-  100% { height: 12px; }
+/* Session Floor Coach Badge */
+.session-coach-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  margin: 8px 0;
+}
+
+.coach-avatar {
+  font-size: 1.1rem;
+}
+
+.coach-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.coach-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-lime);
+}
+
+.coach-quote {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ============================================================================
+   Meet Our Coaches Section
+   ============================================================================ */
+.coaches-section {
+  margin: 48px 0;
+  padding: 32px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.coaches-header {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 32px;
+}
+
+.coaches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.coach-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px 18px;
+  text-align: center;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.coach-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 240, 118, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 240, 118, 0.1);
+}
+
+.coach-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.coach-card-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.coach-card-role {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 12px;
+}
+
+.coach-card-bio {
+  font-size: 0.84rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 0 16px 0;
+  flex-grow: 1;
+}
+
+.coach-card-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
 }
 
 /* Main Navigation */
