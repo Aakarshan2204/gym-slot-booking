@@ -479,12 +479,19 @@ function updateNavUserUI() {
   const navMyBookings = document.getElementById("nav-item-my-bookings");
   const navAdmin = document.getElementById("nav-item-admin");
 
-  // Highlight active demo persona chip if logged in
+  // Highlight active demo persona chip if logged in; lock other chips to enforce privacy
   document.querySelectorAll(".demo-chip").forEach(chip => {
     if (state.user && chip.getAttribute("data-email") === state.user.email) {
       chip.classList.add("active-user");
-    } else {
+      chip.classList.remove("restricted");
+      chip.title = `Current Active Persona: ${state.user.name}`;
+    } else if (state.user) {
       chip.classList.remove("active-user");
+      chip.classList.add("restricted");
+      chip.title = "Profile privacy active: Please log out first to switch accounts.";
+    } else {
+      chip.classList.remove("active-user", "restricted");
+      chip.title = `Click to test as ${chip.textContent.trim()}`;
     }
   });
 
@@ -503,7 +510,7 @@ function updateNavUserUI() {
   navSessions.classList.remove("hidden");
   navMyBookings.classList.remove("hidden");
 
-  // Show or hide admin link based on role
+  // Show or hide admin link strictly based on role
   if (state.user.role === "admin") {
     navAdmin.classList.remove("hidden");
   } else {
@@ -511,7 +518,7 @@ function updateNavUserUI() {
   }
 
   navUserPanel.innerHTML = `
-    <div class="user-badge">
+    <div class="user-badge" id="btn-open-profile" title="View Private Member Profile">
       <span class="user-name">${escapeHtml(state.user.name)}</span>
       <span class="user-role ${state.user.role === 'admin' ? 'admin' : ''}">${state.user.role}</span>
     </div>
@@ -519,6 +526,7 @@ function updateNavUserUI() {
   `;
 
   document.getElementById("btn-logout")?.addEventListener("click", () => logout(true));
+  document.getElementById("btn-open-profile")?.addEventListener("click", openProfileModal);
 }
 
 // ============================================================================
@@ -702,21 +710,29 @@ function setupAuthEventListeners() {
     }
   });
 
-  // Quick Demo Persona switcher chips
+  // Quick Demo Persona switcher chips (strictly isolated: members cannot hop into other profiles)
   document.querySelectorAll(".demo-chip").forEach(chip => {
     chip.addEventListener("click", async () => {
       const email = chip.getAttribute("data-email");
       const pass = chip.getAttribute("data-pass");
+
+      // Profile Isolation: If already logged in as a member, prevent accessing another member's profile
+      if (state.user && state.user.email.toLowerCase() !== email.toLowerCase()) {
+        showToast("Profile privacy active: Please log out before switching member accounts.", "info", 4000);
+        sounds.playClick();
+        return;
+      }
+
       try {
         const data = await apiRequest("/api/auth/login", {
           method: "POST",
           body: JSON.stringify({ email, password: pass })
         });
         setAuth(data.token, data.user);
-        showToast(`Switched persona to: ${data.user.name} (${data.user.role})`, "success");
+        showToast(`Authenticated as: ${data.user.name} (${data.user.role})`, "success");
         navigateTo(data.user.role === "admin" ? "#admin" : "#sessions");
       } catch (err) {
-        showToast(`Demo login error: ${err.message}`, "error");
+        showToast(`Login error: ${err.message}`, "error");
       }
     });
   });
@@ -756,11 +772,12 @@ async function renderSessionsView() {
   startPolling();
 }
 
+let _fetchSessionsRetryCount = 0;
+
 async function fetchSessions(isPolling = false) {
   const loading = document.getElementById("sessions-loading");
   const errorBox = document.getElementById("sessions-error");
   const emptyBox = document.getElementById("sessions-empty");
-  const container = document.getElementById("sessions-container");
 
   if (!isPolling) {
     loading.style.display = "flex";
@@ -775,6 +792,7 @@ async function fetchSessions(isPolling = false) {
     }
     const data = await apiRequest(url);
     state.sessions = data.sessions || [];
+    _fetchSessionsRetryCount = 0;
 
     loading.style.display = "none";
     errorBox.style.display = "none";
@@ -783,6 +801,12 @@ async function fetchSessions(isPolling = false) {
   } catch (err) {
     loading.style.display = "none";
     if (!isPolling) {
+      // Auto-retry once after 1s during cold boot to guarantee 100% seamless startup
+      if (_fetchSessionsRetryCount < 2) {
+        _fetchSessionsRetryCount++;
+        setTimeout(() => fetchSessions(false), 1000);
+        return;
+      }
       errorBox.style.display = "flex";
       document.getElementById("sessions-error-msg").textContent = err.message || "Failed to load sessions.";
     }
@@ -811,8 +835,9 @@ function renderSessionsCards() {
   const emptyBox = document.getElementById("sessions-empty");
   const sundayNotice = document.getElementById("sunday-holiday-notice");
 
-  // Check if Sunday is filtered or selected
-  const isSundaySelected = state.selectedMuscle === "Holiday" || (state.selectedDate && new Date(state.selectedDate + "T00:00:00").getDay() === 0);
+  // Check if Sunday is filtered or selected (either via date filter or today is Sunday)
+  const isSundaySelected = state.selectedMuscle === "Holiday" || 
+    (state.selectedDate ? new Date(state.selectedDate + "T00:00:00").getDay() === 0 : new Date().getDay() === 0);
   if (sundayNotice) {
     sundayNotice.style.display = isSundaySelected ? "block" : "none";
   }
@@ -1479,8 +1504,10 @@ async function renderMyBookingsView() {
     startCountdownUpdater();
   } catch (err) {
     loading.style.display = "none";
-    errorBox.style.display = "flex";
-    document.getElementById("my-bookings-error-msg").textContent = err.message || "Failed to load bookings.";
+    if (err.status !== 401) {
+      errorBox.style.display = "flex";
+      document.getElementById("my-bookings-error-msg").textContent = err.message || "Failed to load bookings.";
+    }
   }
 }
 
@@ -1735,6 +1762,13 @@ function openQRModal(code, sessionInfo = null) {
 
   // Generate ISO/IEC 18004 Standard compliant QR Code (210px)
   wrapper.innerHTML = generateQRCodeSVG(code, 210);
+
+  // Security: Staff reception check-in desk button is ONLY visible if user is an Admin
+  const btnStaffDesk = document.getElementById("btn-test-checkin-modal");
+  if (btnStaffDesk) {
+    btnStaffDesk.style.display = state.user?.role === "admin" ? "inline-flex" : "none";
+  }
+
   modal.classList.add("open");
   sounds.playClick();
 }
@@ -1742,6 +1776,37 @@ function openQRModal(code, sessionInfo = null) {
 function closeQRModal() {
   const modal = document.getElementById("qr-modal");
   modal.classList.remove("open");
+}
+
+// ============================================================================
+// Member Profile Modal & Strict Privacy Handlers
+// ============================================================================
+async function openProfileModal() {
+  if (!state.user) return;
+  const modal = document.getElementById("profile-modal");
+  if (!modal) return;
+
+  document.getElementById("profile-modal-title").textContent = state.user.name;
+  document.getElementById("profile-modal-email").textContent = state.user.email;
+  document.getElementById("profile-role").textContent = state.user.role.toUpperCase();
+  document.getElementById("profile-role-badge").textContent = state.user.role === "admin" ? "🛡️ Staff Admin" : "👤 Member";
+  document.getElementById("profile-id").textContent = `#${state.user.id}`;
+  document.getElementById("profile-avatar").textContent = state.user.role === "admin" ? "🛡️" : "👤";
+
+  try {
+    const data = await apiRequest("/api/my-bookings");
+    const activeConfirmed = (data.bookings || []).filter(b => b.status === "confirmed" && !b.has_ended).length;
+    const waitlistCount = (data.waitlist || []).length;
+    document.getElementById("profile-bookings-count").textContent = activeConfirmed;
+    document.getElementById("profile-waitlist-count").textContent = waitlistCount > 0 ? `#${waitlistCount} In Line` : "None";
+  } catch (_) {}
+
+  modal.classList.add("open");
+  sounds.playClick();
+}
+
+function closeProfileModal() {
+  document.getElementById("profile-modal")?.classList.remove("open");
 }
 
 function downloadPassTicket(code) {
@@ -2194,20 +2259,15 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadPassTicket(code);
   });
 
-  document.getElementById("btn-test-checkin-modal")?.addEventListener("click", async () => {
+  // Staff Check-In Desk Button (Strictly restricted to Admin role; cannot be used by regular members)
+  document.getElementById("btn-test-checkin-modal")?.addEventListener("click", () => {
     const code = state.currentQRModalCode;
     if (!code) return;
     closeQRModal();
 
     if (state.user?.role !== "admin") {
-      try {
-        const data = await apiRequest("/api/auth/login", {
-          method: "POST",
-          body: JSON.stringify({ email: "admin@gympulse.com", password: "AdminPass123!" })
-        });
-        setAuth(data.token, data.user);
-        showToast("Switched to Admin reception desk to test check-in...", "info");
-      } catch (_) {}
+      showToast("Access restricted: Regular members cannot access administrative check-in desk.", "error", 4000);
+      return;
     }
 
     navigateTo("#admin");
@@ -2219,6 +2279,19 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("admin-checkin-form")?.requestSubmit();
       }
     }, 250);
+  });
+
+  // Profile Modal listeners
+  document.getElementById("profile-modal-close")?.addEventListener("click", closeProfileModal);
+  document.getElementById("profile-modal")?.addEventListener("click", (e) => {
+    if (e.target.id === "profile-modal") closeProfileModal();
+  });
+  document.getElementById("btn-profile-logout")?.addEventListener("click", () => {
+    closeProfileModal();
+    logout(true);
+  });
+  document.getElementById("btn-profile-view-tickets")?.addEventListener("click", () => {
+    closeProfileModal();
   });
 
   // Router listener

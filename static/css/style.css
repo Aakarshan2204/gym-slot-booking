@@ -2005,3 +2005,155 @@ h1, h2, h3, h4, .page-title, .hero-title {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==========================================================================
+   Member Profile Modal & Privacy Protection Styles
+   ========================================================================== */
+.profile-modal-content {
+  max-width: 520px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 118, 0.08);
+  position: relative;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 240, 118, 0.2), rgba(56, 189, 248, 0.2));
+  border: 2px solid var(--accent-lime);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.profile-title-block {
+  flex: 1;
+}
+
+.profile-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.privacy-status-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.profile-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.profile-email {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.profile-privacy-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(0, 240, 118, 0.06);
+  border: 1px solid rgba(0, 240, 118, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.profile-privacy-banner .privacy-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.profile-privacy-banner strong {
+  color: var(--accent-lime);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.profile-privacy-banner p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.profile-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.profile-detail-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.profile-detail-card .pd-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.profile-detail-card .pd-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.profile-detail-card .pd-val.highlight {
+  color: var(--accent-lime);
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.demo-chip.restricted {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.user-badge {
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.user-badge:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-lime);
+}

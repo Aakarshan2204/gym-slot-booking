@@ -38,7 +38,7 @@
 <body>
 
   <!-- Quick Demo Persona Switcher Bar -->
-  <header class="demo-bar" aria-label="Demo Testing Controls">
+  <header class="demo-bar" id="demo-bar" aria-label="Demo Testing Controls">
     <div class="demo-bar-title">
       <span>⚡ Quick Demo Switcher:</span>
     </div>
@@ -150,9 +150,60 @@
         <button type="button" class="btn btn-secondary btn-sm" id="btn-download-qr-ticket">
           💾 Save Pass Card
         </button>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-test-checkin-modal">
-          🚪 Test Door Check-In
+        <button type="button" class="btn btn-primary btn-sm" id="btn-test-checkin-modal" style="display: none;">
+          🛡️ Staff Check-In Desk
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Profile Modal (Private & Strictly Isolated) -->
+  <div class="modal-overlay" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal-content profile-modal-content">
+      <button type="button" class="modal-close" id="profile-modal-close" aria-label="Close profile modal">&times;</button>
+      
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar">👤</div>
+        <div class="profile-title-block">
+          <div class="profile-badge-row">
+            <span class="user-role" id="profile-role-badge">Member</span>
+            <span class="privacy-status-pill">🔒 Private Profile</span>
+          </div>
+          <h3 id="profile-modal-title" class="profile-name">Member Profile</h3>
+          <p class="profile-email" id="profile-modal-email">member@gympulse.com</p>
+        </div>
+      </div>
+
+      <div class="profile-privacy-banner">
+        <span class="privacy-icon">🛡️</span>
+        <div>
+          <strong>Strict Profile Privacy & Account Isolation</strong>
+          <p>Your bookings, door check-in access codes, and profile information are strictly private. Other gym members cannot see or modify your account.</p>
+        </div>
+      </div>
+
+      <div class="profile-details-grid">
+        <div class="profile-detail-card">
+          <span class="pd-label">Account Role</span>
+          <span class="pd-val" id="profile-role">Member</span>
+        </div>
+        <div class="profile-detail-card">
+          <span class="pd-label">Member ID</span>
+          <span class="pd-val" id="profile-id">#--</span>
+        </div>
+        <div class="profile-detail-card">
+          <span class="pd-label">Active Bookings</span>
+          <span class="pd-val highlight" id="profile-bookings-count">0</span>
+        </div>
+        <div class="profile-detail-card">
+          <span class="pd-label">Waitlist Position</span>
+          <span class="pd-val" id="profile-waitlist-count">None</span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <a href="#my-bookings" class="btn btn-primary btn-sm" id="btn-profile-view-tickets">🎟️ View My Tickets</a>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-profile-logout">Log Out</button>
       </div>
     </div>
   </div>

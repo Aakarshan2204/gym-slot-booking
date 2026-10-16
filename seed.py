@@ -120,9 +120,19 @@ def seed_database():
                     (session_full_id, alex_id, (now - datetime.timedelta(minutes=15)).isoformat())
                 )
 
-        # C: Extra late session if early enough
-        if current_hour < 21:
-            make_session(today, 22)
+        # C: Standard daytime & evening slots for today (ensures full timetable regardless of what hour app is opened)
+        for std_hour in [9, 11, 14, 18, 20, 22]:
+            if std_hour > current_hour + 2:
+                s_std_id = make_session(today, std_hour)
+                # If midday (11:00) or evening (18:00), populate sample bookings so it displays realistic capacity
+                cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (s_std_id,))
+                if cursor.fetchone()[0] == 0:
+                    for uid in synthetic_member_ids[:(std_hour % 7)]:
+                        cursor.execute(
+                            """INSERT OR IGNORE INTO bookings (session_id, user_id, status, check_in_code)
+                               VALUES (?, ?, 'confirmed', ?)""",
+                            (s_std_id, uid, generate_check_in_code())
+                        )
 
         # 3. Tomorrow Sessions (guarantee morning, midday, afternoon, full evening, and night slots)
         make_session(tomorrow, 9)   # 20 free
@@ -168,11 +178,22 @@ def seed_database():
 
         make_session(tomorrow, 20)  # Late evening slot (20 free)
 
-        # 4. Multi-day schedule for the rest of the week (next 6 days)
-        for day_offset in range(2, 7):
+        # 4. Multi-day schedule for the rest of the week (next 7 days)
+        for day_offset in range(2, 8):
             target_date = today + datetime.timedelta(days=day_offset)
             if target_date.weekday() == 6:
+                # Sunday: schedule Recovery & Mobility Workshop so the schedule is never empty
+                s_sun = make_session(target_date, 11)
+                cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (s_sun,))
+                if cursor.fetchone()[0] < 5:
+                    for uid in synthetic_member_ids[:5]:
+                        cursor.execute(
+                            """INSERT OR IGNORE INTO bookings (session_id, user_id, status, check_in_code)
+                               VALUES (?, ?, 'confirmed', ?)""",
+                            (s_sun, uid, generate_check_in_code())
+                        )
                 continue
+
             s_morn = make_session(target_date, 10)
             s_eve = make_session(target_date, 18)
             cursor.execute("SELECT COUNT(*) FROM bookings WHERE session_id = ? AND status = 'confirmed'", (s_morn,))

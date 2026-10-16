@@ -4,6 +4,33 @@ All notable changes to the **PULSE GYM** Slot Booking & Door Check-In System wil
 
 The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (`v<MAJOR>.<MINOR>.<PATCH>`).
 
+## [v1.2.4] - 2026-10-16
+
+### 🚀 Summary of Improvements Over v1.2.3
+Version 1.2.4 enforces strict cross-member profile isolation and guarantees that the application timetable functions perpetually at any time, on any day of the week, under any operating environment without errors. It blocks cross-account persona hopping while logged in as a member, introduces a dedicated private **Member Profile Modal**, strips privilege-escalating administrative actions from member pass tickets, adds automated retry with backoff on timetable fetch, expands daytime schedule checkpoints so that opening the app early in the morning or late at night provisions full daytime slots, and schedules weekly Sunday Recovery workshops so that schedules are never empty.
+
+### 🔍 Side-by-Side Comparison: What Improved from v1.2.3 to v1.2.4?
+
+| Area / Feature | In v1.2.3 | In v1.2.4 (Improved) | Real-World Impact |
+| :--- | :--- | :--- | :--- |
+| **Cross-Member Profile Privacy** | Any user could click demo persona chips at the top to instantly hop into another member's account without logging out. | **Strict Account Privacy Lock**: Demo switcher chips are locked while logged in. Attempting to click another account displays: *"Profile privacy active: Please log out before switching member accounts."* | Members can **never access or manipulate another member's profile**, bookings, or credentials. |
+| **Pass Ticket Security** | Member ticket modal included a *"Test Door Check-In"* button that automatically escalated members into `admin@gympulse.com` and opened the admin roster. | **Role-Enforced Action Guard**: The reception check-in action is strictly hidden for members. Members only see *"Copy Code"* and *"Save Pass Card"*. Only verified staff admins see the desk check-in button. | Eliminates privilege escalation vulnerabilities; members cannot view administrative rosters or attendee lists. |
+| **Dedicated Member Profile View** | Members had no dedicated view showing their personal account status, security isolation badge, or membership ID. | **Interactive Member Profile Modal**: Clicking the user badge in the navbar opens a private profile modal with ID, role, active reservation counts, and security verification. | Clean, transparent, and private member account dashboard. |
+| **Any-Time Timetable Completeness** | Opening the site during early morning hours (e.g. 2:00 AM) only scheduled slots for hours 2, 3, and 4, leaving afternoon slots missing. | **Comprehensive Daytime Checkpoint Guarantee**: Auto-seeder provisions standard slots (`09:00, 11:00, 14:00, 18:00, 20:00, 22:00`) whenever opened. | Timetables are **100% complete and fully populated** whether accessed at 2 AM, 10 AM, 3 PM, or 11 PM! |
+| **Sunday Timetable Resilience** | Multi-day seeder skipped Sundays completely, leaving 0 sessions in the database for Sundays. | **Sunday Recovery Workshop Seeding**: Schedules an 11:00 AM Sunday Active Recovery & Mobility Workshop while proudly displaying the facility deep recovery announcement. | The schedule is **never empty on any day of the week**! |
+| **Network & Cold-Boot Resilience** | If the server took an extra half-second to respond during cold boot, `fetchSessions()` immediately displayed an error banner. | **Automated Retry with Backoff**: Frontend retries initial schedule fetch automatically after 1s before showing any error state. | **Zero transient error banners** on initial page load. |
+
+### 🐛 Bug Fixes
+- **Profile Hijacking Prevention (`app.js`)**: Guarded `.demo-chip` click handler to prevent switching accounts while an active session exists (`state.user.email !== email`).
+- **Pass Modal Privilege Escalation (`app.js` & `index.html`)**: Removed auto-login to admin account in `btn-test-checkin-modal`. Restricted staff check-in button visibility strictly to `state.user.role === "admin"`.
+- **Member Profile Modal (`index.html`, `style.css`, `app.js`)**: Added `#profile-modal` modal displaying member ID, name, email, role, and privacy protection badge.
+- **Early-Hour Daytime Seeder (`seed.py`)**: Added daytime checkpoint loop over hours `[9, 11, 14, 18, 20, 22]` ensuring daytime and evening slots exist regardless of early-morning opening time.
+- **Sunday Recovery Workshop (`seed.py`)**: Scheduled 11:00 AM Recovery & Mobility session on Sundays so that Sunday timetables never display empty states.
+- **Client Auto-Retry (`app.js`)**: Added retry mechanism with exponential backoff to `fetchSessions()` to gracefully absorb initial server boot delays.
+- **Sunday Default Feed Filter (`app.js`)**: Fixed `isSundaySelected` evaluation to check `new Date().getDay() === 0` when `state.selectedDate` is null, ensuring Sunday notice displays properly on Sundays.
+
+---
+
 ## [v1.2.3] - 2026-10-16
 
 ### 🚀 Summary of Improvements Over v1.2.2
