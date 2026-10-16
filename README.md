@@ -11,7 +11,7 @@
 
 ---
 
-## 1. Architecture Overview (Stack & Data Model)
+## 1. Design Note (Stack & Data Model)
 
 ```text
 Stack: Python 3.13 backend (HTTP server with SQLite WAL mode), bcrypt password hashing, HS256 JWT auth, and Vanilla ES6 SPA frontend.
@@ -91,7 +91,7 @@ The database comes pre-seeded with realistic member and staff accounts across mu
 
 ---
 
-## 5. Facility Rules & Operational Parameters
+## 5. Assumptions & Operational Rules
 
 1. **Gym Opening Hours & Sessions**: Small-group training blocks are 1 hour in length, scheduled throughout daytime hours with an optimal 20-athlete facility capacity.
 2. **Cancellation Cutoff**: Members can cancel anytime prior to the start time (`now < session.start_time`). Once a session starts, bookings cannot be cancelled to preserve coach planning.
