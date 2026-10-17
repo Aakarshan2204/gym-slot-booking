@@ -16,12 +16,12 @@ def seed_database():
         cursor = conn.cursor()
 
         # Helper to get or create a user by email non-destructively
-        def get_or_create_user(name: str, email: str, plain_pass: str, role: str = "member") -> int:
+        def get_or_create_user(name: str, email: str, plain_pass: str = "MemberPass123!", role: str = "member", precomputed_hash: str = None) -> int:
             cursor.execute("SELECT id FROM users WHERE email = ? COLLATE NOCASE", (email.strip(),))
             row = cursor.fetchone()
             if row:
                 return row[0]
-            pw_hash = hash_password(plain_pass)
+            pw_hash = precomputed_hash or hash_password(plain_pass)
             cursor.execute(
                 "INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)",
                 (name.strip(), email.strip().lower(), pw_hash, role)
@@ -38,8 +38,9 @@ def seed_database():
         get_or_create_user("Aakarshan", "goyalaakarshan2204@gmail.com", "MemberPass123!", "member")
 
         synthetic_member_ids = []
+        shared_member_hash = hash_password("MemberPass123!")
         for i in range(1, 22):
-            uid = get_or_create_user(f"Member {i}", f"member{i}@gympulse.com", "MemberPass123!", "member")
+            uid = get_or_create_user(f"Member {i}", f"member{i}@gympulse.com", "MemberPass123!", "member", precomputed_hash=shared_member_hash)
             synthetic_member_ids.append(uid)
 
         now = datetime.datetime.now()

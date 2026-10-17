@@ -924,7 +924,7 @@ function renderSessionsCards() {
             <button type="button" class="muscle-thumb-btn btn-open-exercise-preview"
               data-day="${dayName}"
               title="Click to view ${badgeName} exercise guide & poster">
-              <img src="${exercisePhoto}" alt="${badgeName}">
+              <img src="${exercisePhoto}" alt="${badgeName}" loading="lazy" decoding="async">
             </button>
           </div>
 
@@ -1174,7 +1174,7 @@ function renderWeeklySplitSection(dayName = state.activeSplitDay) {
     <!-- Column 1: Cinematic Workout Poster -->
     <div class="split-poster-side">
       <div class="split-poster-wrapper" id="btn-split-poster-zoom" title="Click to view full-resolution poster">
-        <img src="${split.poster}" alt="${split.badge} Poster" class="split-poster-img">
+        <img src="${split.poster}" alt="${split.badge} Poster" class="split-poster-img" loading="lazy" decoding="async">
         <div class="split-poster-overlay">
           <div class="split-poster-top">
             <span class="split-poster-badge" style="border-color: ${split.color}; color: ${split.color};">
@@ -1220,7 +1220,7 @@ function renderWeeklySplitSection(dayName = state.activeSplitDay) {
       <div>
         <div class="split-exercise-hero">
           <div class="split-exercise-img-wrap" id="btn-split-exercise-zoom" title="Click to view full-resolution exercise photo">
-            <img src="${split.exercisePhoto}" alt="${split.primaryExercise}" class="split-exercise-img">
+            <img src="${split.exercisePhoto}" alt="${split.primaryExercise}" class="split-exercise-img" loading="lazy" decoding="async">
           </div>
           <div class="split-exercise-info">
             <h4>${split.isHoliday ? 'Active Recovery & Nutrition' : 'Form Cue & Execution'}</h4>

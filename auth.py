@@ -29,7 +29,7 @@ CODE_LENGTH = 6
 def hash_password(password: str) -> str:
     """Hashes a password with salt using bcrypt or PBKDF2-HMAC-SHA256."""
     if HAS_BCRYPT:
-        salt = bcrypt.gensalt(rounds=12)
+        salt = bcrypt.gensalt(rounds=10)
         hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
         return hashed.decode("utf-8")
     else:

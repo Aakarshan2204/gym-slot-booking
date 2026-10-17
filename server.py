@@ -7,6 +7,7 @@ Provides rock-solid concurrency handling, strict authorization guards, and consi
 import os
 import re
 import json
+import gzip
 import mimetypes
 import datetime
 from http import HTTPStatus
@@ -239,12 +240,19 @@ class GymRequestHandler(BaseHTTPRequestHandler):
         self._send_cors_headers()
         self.end_headers()
 
+    def _client_accepts_gzip(self) -> bool:
+        accept_encoding = self.headers.get("Accept-Encoding", "")
+        return "gzip" in accept_encoding.lower()
+
     def send_json(self, data: Any, status: int = 200):
         body = json.dumps(data, default=str).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
         self._send_cors_headers()
+        if len(body) > 512 and self._client_accepts_gzip():
+            body = gzip.compress(body)
+            self.send_header("Content-Encoding", "gzip")
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 
@@ -312,13 +320,27 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             if path == "/" or not path:
                 path = "/index.html"
             clean_path = os.path.normpath(path.lstrip("/"))
+            if clean_path.startswith("static" + os.sep) or clean_path == "static":
+                clean_path = clean_path[len("static"):].lstrip(os.sep)
+            elif clean_path.startswith("static/"):
+                clean_path = clean_path[len("static/"):].lstrip("/")
             file_path = os.path.join(STATIC_DIR, clean_path)
             if not os.path.isfile(file_path):
                 file_path = os.path.join(STATIC_DIR, "index.html")
             if os.path.isfile(file_path):
                 mime_type, _ = mimetypes.guess_type(file_path)
+                if not mime_type:
+                    mime_type = "text/plain"
+                ext = os.path.splitext(file_path)[1].lower()
+                if ext in [".jpg", ".jpeg", ".png", ".webp", ".svg", ".ico"]:
+                    cache_control = "public, max-age=604800, immutable"
+                elif ext in [".css", ".js", ".woff", ".woff2", ".ttf"]:
+                    cache_control = "public, max-age=86400"
+                else:
+                    cache_control = "no-cache, must-revalidate"
                 self.send_response(HTTPStatus.OK)
-                self.send_header("Content-Type", mime_type or "text/html")
+                self.send_header("Content-Type", f"{mime_type}; charset=utf-8" if "text" in mime_type or "javascript" in mime_type else mime_type)
+                self.send_header("Cache-Control", cache_control)
                 self.send_header("Content-Length", str(os.path.getsize(file_path)))
                 self._send_cors_headers()
                 self.end_headers()
@@ -402,12 +424,30 @@ class GymRequestHandler(BaseHTTPRequestHandler):
             mime_type, _ = mimetypes.guess_type(file_path)
             if not mime_type:
                 mime_type = "text/plain"
+
+            ext = os.path.splitext(file_path)[1].lower()
+            if ext in [".jpg", ".jpeg", ".png", ".webp", ".svg", ".ico"]:
+                cache_control = "public, max-age=604800, immutable"
+            elif ext in [".css", ".js", ".woff", ".woff2", ".ttf"]:
+                cache_control = "public, max-age=86400"
+            else:
+                cache_control = "no-cache, must-revalidate"
+
             with open(file_path, "rb") as f:
                 content = f.read()
+
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", f"{mime_type}; charset=utf-8" if "text" in mime_type or "javascript" in mime_type else mime_type)
-            self.send_header("Content-Length", str(len(content)))
+            self.send_header("Cache-Control", cache_control)
             self._send_cors_headers()
+
+            # Compress text-based static assets (CSS, JS, SVG, HTML)
+            is_compressible = any(t in mime_type for t in ["text", "javascript", "json", "svg", "xml"])
+            if is_compressible and len(content) > 512 and self._client_accepts_gzip():
+                content = gzip.compress(content)
+                self.send_header("Content-Encoding", "gzip")
+
+            self.send_header("Content-Length", str(len(content)))
             self.end_headers()
             self.wfile.write(content)
         else:
@@ -1309,7 +1349,7 @@ def open_browser_when_ready():
     import webbrowser
     time.sleep(0.4)
     try:
-        webbrowser.open(f"http://localhost:{PORT}")
+        webbrowser.open(f"http://127.0.0.1:{PORT}")
     except Exception:
         pass
 
